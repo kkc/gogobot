@@ -24,18 +24,18 @@ import logging
 
 # The location where all of Err's data should be stored. Make sure to set
 # this to a directory that is writable by the user running the bot.
-BOT_DATA_DIR = u'/Users/fawkeswei/Documents/Code/GogoBot'
+BOT_DATA_DIR = u''
 
 # Set this to a directory on your system where you want to load extra
 # plugins from, which is useful mostly if you want to develop a plugin
 # locally before publishing it. Note that you can specify only a single
 # directory, however you are free to create subdirectories with multiple
 # plugins inside this directory.
-BOT_EXTRA_PLUGIN_DIR = u'/Users/fawkeswei/Documents/Code/GogoBot'
+BOT_EXTRA_PLUGIN_DIR = u''
 
 # The location of the log file. If you set this to None, then logging will
 # happen to console only.
-BOT_LOG_FILE = u'/Users/fawkeswei/Documents/Code/GogoBot/GogoBot.log'
+BOT_LOG_FILE = u'GogoBot.log'
 
 # The verbosity level of logging that is done to the above logfile, and to
 # the console. This takes the standard Python logging levels, DEBUG, INFO,
@@ -100,7 +100,7 @@ BOT_ADMINS = (u'62755_433911@chat.hipchat.com',)
 # should include the # sign here. For XMPP rooms that are password
 # protected, you can specify another tuple here instead of a string,
 # using the format (RoomName, Password).
-CHATROOM_PRESENCE = [(u'62755_ios_developers@conf.hipchat.com', ''), (u'62755_gogolook_developers@conf.hipchat.com',''), (u'62755_area51@conf.hipchat.com','')]
+CHATROOM_PRESENCE = [(u'62755_gogolook_developers@conf.hipchat.com',''), (u'62755_area51@conf.hipchat.com','')]
 
 # The FullName, or nickname, your bot should use. What you set here will
 # be the nickname that Err shows in chatrooms. Note that some XMPP
