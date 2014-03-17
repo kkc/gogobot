@@ -1,0 +1,6 @@
+[Core]
+Name = WhosCallSearch
+Module = whoscallsearch
+
+[Documentation]
+Description = let search numbers!
