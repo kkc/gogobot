@@ -40,3 +40,6 @@ venv/
 
 # plugin db
 *.db
+
+# Logs
+GogoBot.log
