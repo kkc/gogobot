@@ -38,7 +38,8 @@ nosetests.xml
 # Virtualenv
 venv/
 
-# plugin db
+# plugins
+plugins
 *.db
 
 # Logs
