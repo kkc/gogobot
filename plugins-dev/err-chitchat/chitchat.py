@@ -1,27 +1,39 @@
 # -*- coding: utf8 -*-
 
-# This is a skeleton for Err plugins, use this to get started quickly.
+# unused args
+# pylint: disable-msg=W0613
+# no init
+# pylint: disable-msg=W0232
+
+
+"""
+
+errbot plugin - ChitChat
+
+Just messing around~
+
+"""
 
 from errbot import BotPlugin, botcmd
-from errbot.builtins.webserver import webhook
 import requests
-import pdb
 import json
 import random
 
 class ChitChat(BotPlugin):
-    ''' Annoying chit chat bot
+    ''' Annoying chit chat plugin
     '''
     min_err_version = '1.6.0' # Optional, but recommended
     max_err_version = '2.0.0' # Optional, but recommended
 
-    @botcmd                               # this tag this method as a command
+    @botcmd
     def look(self, message, args):
+        ''' send gogolook emoji when received command look
+        '''
         self.send(message.getFrom(), \
-                          '(gogolook)', \
-                          message_type=message.getType())
+                  '(gogolook)', \
+                  message_type=message.getType())
 
-    def callback_message(self, conn, message):
+    def callback_message(self, connection, message):
         ''' Triggered for every received message that isn't coming 
             from the bot itself
         '''
@@ -46,13 +58,20 @@ class ChitChat(BotPlugin):
         })
 
         action_list.append({
+            'keyword': 'gogolook',
+            'response': [
+                '(gogolook)',
+                ''
+            ]
+        })
+
+        action_list.append({
             'keyword': 'kakashi',
             'response': [
                 'https://dl.dropboxusercontent.com/u/3256092/hipchat/k.jpg',
-                'https://dl.dropboxusercontent.com/u/3256092/hipchat/ka2.jpg',
-                'https://dl.dropboxusercontent.com/u/3256092/hipchat/kaka3.jpg',
-                'https://dl.dropboxusercontent.com/u/3256092/hipchat/ka2.jpg',
                 'https://dl.dropboxusercontent.com/u/3256092/hipchat/k.jpg',
+                'https://dl.dropboxusercontent.com/u/3256092/hipchat/ka2.jpg',
+                'https://dl.dropboxusercontent.com/u/3256092/hipchat/ka2.jpg',
                 'https://dl.dropboxusercontent.com/u/3256092/hipchat/ka2.jpg',
                 '',
                 ''
@@ -72,7 +91,7 @@ class ChitChat(BotPlugin):
         action_list.append({
             'keyword': '安安',
             'response': [
-                '安安 幾歲 住哪 給虧嗎',
+                '安安 幾歲 住哪',
                 ' ',
                 ' ',
                 '(troll)',
