@@ -18,6 +18,10 @@ from errbot import BotPlugin, botcmd
 import requests
 import json
 import random
+import sys
+import xml.etree.ElementTree as xml
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 class ChitChat(BotPlugin):
     ''' Annoying chit chat plugin
@@ -25,6 +29,10 @@ class ChitChat(BotPlugin):
     min_err_version = '1.6.0' # Optional, but recommended
     max_err_version = '2.0.0' # Optional, but recommended
 
+    def getgirls(self):
+        a=json.loads(requests.get('http://curator.im/api/stream/?token=da39a3ee5e6b4b0d3255bfef95601890afd80709&page='+str(int(random.random()*140))).content)
+        
+        return a['results'][int(random.random()*50)]['thumbnail']
     @botcmd
     def look(self, message, args):
         ''' send gogolook emoji when received command look
@@ -85,6 +93,13 @@ class ChitChat(BotPlugin):
                     requests.get('http://more.handlino.com/sentences.json?'\
                                      'limit=27').content
                 )['sentences'][0],
+            ]
+        })
+
+        action_list.append({
+            'keyword': u'看正妹',
+            'response': [
+                self.getgirls()
             ]
         })
 
