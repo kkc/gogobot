@@ -30,7 +30,7 @@ class ChitChat(BotPlugin):
     max_err_version = '2.0.0' # Optional, but recommended
 
     def getgirls(self):
-        a=json.loads(requests.get('http://curator.im/api/stream/?token=da39a3ee5e6b4b0d3255bfef95601890afd80709&page='+str(int(random.random()*140))).content)
+        a=json.loads(requests.get('http://curator.im/api/stream/?token=3b57cbb863364e9eb2f4cd7f833df331&page='+str(int(random.random()*140))).content)
         
         return a['results'][int(random.random()*50)]['thumbnail']
     @botcmd
