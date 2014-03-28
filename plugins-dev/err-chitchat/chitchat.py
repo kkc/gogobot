@@ -32,7 +32,7 @@ class ChitChat(BotPlugin):
     def getgirls(self):
         a=json.loads(requests.get('http://curator.im/api/stream/?token=3b57cbb863364e9eb2f4cd7f833df331&page='+str(int(random.random()*140))).content)
         
-        return a['results'][int(random.random()*50)]['thumbnail']
+        return a['results'][int(random.random()*50)]['image']
     @botcmd
     def look(self, message, args):
         ''' send gogolook emoji when received command look
