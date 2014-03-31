@@ -29,10 +29,11 @@ class ChitChat(BotPlugin):
     min_err_version = '1.6.0' # Optional, but recommended
     max_err_version = '2.0.0' # Optional, but recommended
 
-    def getgirls(self):
+    def getgirls(self,message):
         a=json.loads(requests.get('http://curator.im/api/stream/?token=3b57cbb863364e9eb2f4cd7f833df331&page='+str(int(random.random()*140))).content)
-        
-        return a['results'][int(random.random()*50)]['image']
+        index=int(random.random()*50)
+        self.send(message.getFrom(),"小海嚴選正妹 - "+a['results'][index]['name'] ,message_type=message.getType())
+        return a['results'][index]['image']
     @botcmd
     def look(self, message, args):
         ''' send gogolook emoji when received command look
@@ -99,7 +100,7 @@ class ChitChat(BotPlugin):
         action_list.append({
             'keyword': u'看正妹',
             'response': [
-                self.getgirls()
+                self.getgirls(message)
             ]
         })
 
