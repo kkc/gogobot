@@ -28,11 +28,12 @@ class ChitChat(BotPlugin):
     '''
     min_err_version = '1.6.0' # Optional, but recommended
     max_err_version = '2.0.0' # Optional, but recommended
-
+    girl_source=''
     def getgirls(self,message):
         a=json.loads(requests.get('http://curator.im/api/stream/?token=3b57cbb863364e9eb2f4cd7f833df331&page='+str(int(random.random()*140))).content)
         index=int(random.random()*50)
-        self.send(message.getFrom(),"小海嚴選正妹 - "+a['results'][index]['name'] ,message_type=message.getType())
+        self.girl_source="小海嚴選正妹 - "+a['results'][index]['name'] 
+        #self.send(message.getFrom(),"小海嚴選正妹 - "+a['results'][index]['name'] ,message_type=message.getType())
         return a['results'][index]['image']
     @botcmd
     def look(self, message, args):
@@ -97,13 +98,21 @@ class ChitChat(BotPlugin):
             ]
         })
 
+        
         action_list.append({
-            'keyword': u'看正妹',
+            'keyword': u'喝什麼',
             'response': [
-                self.getgirls(message)
+                '50嵐',
+                '英國藍',
+                '水巷茶弄',
+                '享甜',
+                '橘子工坊',
+                '喝什麼! 喝水啊!!',
+                '喝什麼! 喝水啊!!',
+                '喝什麼! 喝水啊!!',
+                '喝什麼! 喝水啊!!'
             ]
         })
-
         action_list.append({
             'keyword': '安安',
             'response': [
@@ -144,12 +153,17 @@ class ChitChat(BotPlugin):
 
         message_string = message.getBody().lower()
         message_from = message.getFrom().getResource()
-        print 'got message [' + message_string + '] from [' + message_from + ']'
+        #print 'got message [' + message_string + '] from [' + message_from + ']'
 
+        if message_string == u'看正妹':
+            self.send(message.getFrom(),message_string ,message_type=message.getType())
+            self.send(message.getFrom(),self.getgirls(message) ,message_type=message.getType())
+            self.send(message.getFrom(),self.girl_source ,message_type=message.getType())
         for action in action_list:
             if message_string.find(action['keyword']) != -1:
                 response_message = random.choice(action['response'])
                 self.send(message.getFrom(), \
                           response_message, \
                           message_type=message.getType())
+
                 return
