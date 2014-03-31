@@ -32,7 +32,7 @@ class ChitChat(BotPlugin):
     def getgirls(self,message):
         a=json.loads(requests.get('http://curator.im/api/stream/?token=3b57cbb863364e9eb2f4cd7f833df331&page='+str(int(random.random()*140))).content)
         index=int(random.random()*50)
-        self.girl_source="小海嚴選正妹 - "+a['results'][index]['name'] 
+        self.girl_source="小海嚴選正妹 - "+a['results'][index]['name']+" - "+a['results'][index]['url']
         #self.send(message.getFrom(),"小海嚴選正妹 - "+a['results'][index]['name'] ,message_type=message.getType())
         return a['results'][index]['image']
     @botcmd
@@ -156,7 +156,6 @@ class ChitChat(BotPlugin):
         #print 'got message [' + message_string + '] from [' + message_from + ']'
 
         if message_string == u'看正妹':
-            self.send(message.getFrom(),message_string ,message_type=message.getType())
             self.send(message.getFrom(),self.getgirls(message) ,message_type=message.getType())
             self.send(message.getFrom(),self.girl_source ,message_type=message.getType())
         for action in action_list:
