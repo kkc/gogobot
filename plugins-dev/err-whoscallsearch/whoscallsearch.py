@@ -48,10 +48,12 @@ class WhosCallSearch(BotPlugin):
         yield '(whoscall) searching [' + e164 + ']...'
 
         result = WhosCallSearch.whoscallsearch_v3(e164)
-        if len(result) <= 0:
-            yield 'no info in whoscall database (sadtroll)'
+        if result['available'] == 1:
+            del result['available']
+            for (key, value) in result.iteritems():
+                yield key + ': ' + value
         else:
-            yield '/code ' + json.dumps(result, indent=4)
+            yield 'no info in whoscall database (sadtroll)'
 
     @staticmethod
     def whoscallsearch_v3(e164):
@@ -65,7 +67,16 @@ class WhosCallSearch(BotPlugin):
                          })
 
         result = json.loads(result.content)
-        return result
+
+        data = {}
+        data['available'] = result['dataavailable']
+        data['name'] = result['name']['name']
+        data['source'] = result['name']['source']
+        data['spam'] = result['spamcategory']['category']
+        data['image'] = result['image']
+        data['telecom'] = result['telecom']
+
+        return data
 
 
     @staticmethod
