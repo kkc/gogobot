@@ -55,6 +55,27 @@ class WhosCallSearch(BotPlugin):
         else:
             yield 'no info in whoscall database (sadtroll)'
 
+    @botcmd
+    def text(self, message, args):
+        results = WhosCallSearch.textsearch(args)
+        for result in results:
+            yield 'title: ' + result['title'] + '\n' + 'address: ' + result['address'] + '\n' + 'number: ' + result['e164']
+
+    @staticmethod
+    def textsearch(keyword):
+        ''' do textsearch
+        '''
+        result = requests.get('http://api.dev.whoscall.com:8889/textsearch/' +\
+                               keyword,
+                         headers={
+                            "appid": "def93581",
+                            "appkey": "e505f8aa43fd7c5cec81299e4b36c9bf"
+                         })
+        result = json.loads(result.content)
+
+        return result['results']
+
+
     @staticmethod
     def whoscallsearch_v3(e164):
         ''' do whoscall search version 3
