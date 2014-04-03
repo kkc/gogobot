@@ -19,13 +19,14 @@ from errbot import BotPlugin, botcmd
 import phonenumbers
 import requests
 import json
+import pdb
 
 class WhosCallSearch(BotPlugin):
     ''' Let's search numbers!
     '''
 
     @botcmd
-    def search(self, message, args):
+    def search_v2(self, message, args):
         ''' search info for this number
         '''
         e164 = phonenumbers.format_number(phonenumbers.parse(args, 'TW'), \
@@ -38,6 +39,45 @@ class WhosCallSearch(BotPlugin):
             yield 'no info in whoscall database (sadtroll)'
         else:
             yield '/code ' + ' \n'.join(result)
+
+    @botcmd
+    def search(self, message, args):
+        e164 = phonenumbers.format_number(phonenumbers.parse(args, 'TW'), \
+                                          phonenumbers.PhoneNumberFormat.E164)
+
+        yield '(whoscall) searching [' + e164 + ']...'
+
+        result = WhosCallSearch.whoscallsearch_v3(e164)
+        if result['available'] == 1:
+            del result['available']
+            for (key, value) in result.iteritems():
+                yield key + ': ' + value
+        else:
+            yield 'no info in whoscall database (sadtroll)'
+
+    @staticmethod
+    def whoscallsearch_v3(e164):
+        ''' do whoscall search version 3
+        '''
+        result = requests.get('https://api.whoscall.com/whoscallsearch/' + \
+                               e164.replace('+', '') + '?version=3',
+                         headers={
+                            "appid": "def93581",
+                            "appkey": "e505f8aa43fd7c5cec81299e4b36c9bf"
+                         })
+
+        result = json.loads(result.content)
+
+        data = {}
+        data['available'] = result['dataavailable']
+        data['name'] = result['name']['name']
+        data['source'] = result['name']['source']
+        data['spam'] = result['spamcategory']['category']
+        data['image'] = result['image']
+        data['telecom'] = result['telecom']
+
+        return data
+
 
     @staticmethod
     def get_tag_suggestions(e164):
