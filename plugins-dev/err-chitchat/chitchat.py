@@ -158,6 +158,9 @@ class ChitChat(BotPlugin):
         if message_string == u'看正妹':
             self.send(message.getFrom(),self.getgirls(message) ,message_type=message.getType())
             self.send(message.getFrom(),self.girl_source ,message_type=message.getType())
+        if message_string.find(u'去吃飯') != -1:
+            self.send(message.getFrom(),'http://static.nownews.com/newspic/1668/i1668882.jpg' ,message_type=message.getType())
+            self.send(message.getFrom(),u'不能吃太胖喔，會被殺掉的' ,message_type=message.getType())
         for action in action_list:
             if message_string.find(action['keyword']) != -1:
                 response_message = random.choice(action['response'])
