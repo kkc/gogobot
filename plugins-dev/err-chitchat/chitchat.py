@@ -89,6 +89,15 @@ class ChitChat(BotPlugin):
         })
 
         action_list.append({
+            'keyword': '長老',
+            'response': [
+                '',
+                '',
+                'https://s3-ap-northeast-1.amazonaws.com/uploads-jp.hipchat.com/62755/528356/SQpklcMNN822dAS/1920034_603274453082244_295086871_n.jpg',
+            ]
+        })
+
+        action_list.append({
             'keyword': u'吃飯飯',
             'response': [
                 json.loads(
@@ -113,6 +122,8 @@ class ChitChat(BotPlugin):
                 '喝什麼! 喝水啊!!'
             ]
         })
+
+
         action_list.append({
             'keyword': '安安',
             'response': [
