@@ -94,7 +94,7 @@ BOT_IDENTITY = {
 # Note: With campfire this should be the full name of a person, like so:
 # BOT_ADMINS = ('Guillaume Binet',)
 #
-BOT_ADMINS = (u'62755_433911@chat.hipchat.com',)
+BOT_ADMINS = ('62755_433911@chat.hipchat.com','62755_675759@chat.hipchat.com',)
 
 # Chatrooms your bot should join on startup. For the IRC backend you
 # should include the # sign here. For XMPP rooms that are password

@@ -4,10 +4,18 @@ Gogolook Hipchat bot created using [err bot](https://github.com/gbin/err)
 
 ## Setup
 1. clone [https://github.com/Gogolook-Inc/GogoBot](https://github.com/Gogolook-Inc/GogoBot)
+2. go into directory `cd GogoBot`
 2. create python virtual environment `virtualenv venv`
 3. activate python virtual environment `source venv/bin/activate`
+5. set flag or errbot will not be installed due to some " fatal error: 'ffi.h' file not found"
+	`sudo bash`
+	`export CFLAGS=-Qunused-arguments`
+	`export CPPFLAGS=-Qunused-arguments`
+	`export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig/`
 4. install err `pip install err`
-5. run bot `err.py`
+7. install sleekxmpp 1.1.0 (version >1.1 will come with "ERROR:sleekxmpp.plugins.base:Unable to load plugin: old_0004")
+	`pip install sleekxmpp==1.1.0`
+5. finally, run bot `err.py`
 
 
 ## Plugin Development
