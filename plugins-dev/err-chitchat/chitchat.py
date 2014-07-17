@@ -703,6 +703,13 @@ class ChitChat(BotPlugin):
                            ], 'chance': 30, 'commonDia': False
                            })
 
+        action_list.append({
+                           'keyword': ['＝ ='],
+                           'response': [
+                               '= =|', 'XDDDD','XD','= ='
+                           ], 'chance': 30, 'commonDia': False
+                           })
+
         print '1'
 
         # 亂回機制1
