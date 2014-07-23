@@ -44,3 +44,11 @@ plugins
 
 # Logs
 GogoBot.log
+scope_settings.xml
+workspace.xml
+vcs.xml
+.idea/.name
+.idea/encodings.xml
+.idea/GogoBot.iml
+.idea/misc.xml
+.idea/modules.xml
