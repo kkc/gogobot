@@ -14,18 +14,14 @@ Just messing around~
 
 """
 
-from errbot import BotPlugin, botcmd
-import requests
 import json
 import random
 import sys
 import time
-import feedparser
-import gspread
-import copy_strings
-import xml.etree.ElementTree as xml
-from copy_strings import getAction
 
+from errbot import BotPlugin, botcmd
+import requests
+from copy_strings import getAction
 
 
 reload(sys)
@@ -35,32 +31,43 @@ sys.setdefaultencoding("utf-8")
 ShowCompareLog = True
 ShowEmoLog = False
 ShowTalkHis = True
-MaxHistory = 7
+MaxHistory = 10
 LastUpdateTime = 0
 
-
-
-
 emoji = [
-    '(allthethings)', '(android)', '(areyoukiddingme)', '(arrington)', '(arya)', '(ashton)', '(atlassian)', '(awthanks)', '(awyeah)', '(badass)', '(badjokeeel)', '(badpokerface)', '(basket)', '(beer)', '(bitbucket)', '(boom)', '(branch)', '(bumble)', '(bunny)', '(cadbury)', '(cake)', '(candycorn)', '(caruso)', '(ceilingcat)', '(cereal)', '(cerealspit)', '(challengeaccepted)', '(chewie)', '(chocobunny)', '(chompy)', '(chris)', '(chucknorris)', '(clarence)', '(coffee)', '(confluence)', '(content)', '(continue)', '(cornelius)', '(daenerys)', '(dance)', '(dealwithit)', '(derp)', '(disapproval)', '(doge)', '(dosequis)', '(drevil)', '(ducreux)', '(dumb)', '(embarrassed)', '(facepalm)', '(failed)', '(firstworldproblem)', '(fonzie)', '(foreveralone)', '(freddie)', '(fry)', '(fuckyeah)', '(fwp)', '(gangnamstyle)', '(garret)', '(gates)', '(ghost)', '(goodnews)', '(greenbeer)', '(grumpycat)', '(gtfo)', '(haveaseat)', '(heart)', '(hipchat)', '(hipster)', '(hodor)', '(huh)', '(ilied)', '(indeed)', '(iseewhatyoudidthere)', '(itsatrap)', '(jackie)', '(jaime)',
-    '(jira)', '(jobs)', '(joffrey)', '(jonsnow)', '(kennypowers)', '(krang)', '(kwanzaa)', '(lincoln)', '(lol)', '(lolwut)', '(megusta)', '(menorah)', '(mindblown)', '(ned)', '(nextgendev)', '(ninja)', '(notbad)', '(nothingtodohere)', '(notsureif)', '(notsureifgusta)', '(obama)', '(ohcrap)', '(ohgodwhy)', '(okay)', '(omg)', '(oops)', '(orly)', '(pbr)', '(pete)', '(philosoraptor)', '(pingpong)', '(pirate)', '(pokerface)', '(poo)', '(present)', '(pumpkin)', '(rageguy)', '(rebeccablack)', '(reddit)', '(romney)', '(rudolph)', '(sadpanda)', '(sadtroll)', '(samuel)', '(santa)', '(scumbag)', '(seomoz)', '(shamrock)', '(shrug)', '(skyrim)', '(stare)', '(stash)', '(success)', '(successful)', '(sweetjesus)', '(tableflip)', '(taft)', '(tea)', '(thumbsdown)', '(thumbsup)', '(tree)', '(troll)', '(truestory)', '(trump)', '(turkey)', '(twss)', '(tyrion)', '(tywin)', '(unknown)', '(washington)', '(wat)', '(wtf)', '(yey)', '(yodawg)', '(yougotitdude)', '(yuno)', '(zoidberg)', '(zzz)', '8)', ':#', ':$', ':(', ':)', ':-*', ':D', ':Z', ':o', ':p', ':|', ';)', ';p', '>:-(', 'O:)']
-
+    '(allthethings)', '(android)', '(areyoukiddingme)', '(arrington)', '(arya)', '(ashton)', '(atlassian)',
+    '(awthanks)', '(awyeah)', '(badass)', '(badjokeeel)', '(badpokerface)', '(basket)', '(beer)', '(bitbucket)',
+    '(boom)', '(branch)', '(bumble)', '(bunny)', '(cadbury)', '(cake)', '(candycorn)', '(caruso)', '(ceilingcat)',
+    '(cereal)', '(cerealspit)', '(challengeaccepted)', '(chewie)', '(chocobunny)', '(chompy)', '(chris)',
+    '(chucknorris)', '(clarence)', '(coffee)', '(confluence)', '(content)', '(continue)', '(cornelius)', '(daenerys)',
+    '(dance)', '(dealwithit)', '(derp)', '(disapproval)', '(doge)', '(dosequis)', '(drevil)', '(ducreux)', '(dumb)',
+    '(embarrassed)', '(facepalm)', '(failed)', '(firstworldproblem)', '(fonzie)', '(foreveralone)', '(freddie)',
+    '(fry)', '(fuckyeah)', '(fwp)', '(gangnamstyle)', '(garret)', '(gates)', '(ghost)', '(goodnews)', '(greenbeer)',
+    '(grumpycat)', '(gtfo)', '(haveaseat)', '(heart)', '(hipchat)', '(hipster)', '(hodor)', '(huh)', '(ilied)',
+    '(indeed)', '(iseewhatyoudidthere)', '(itsatrap)', '(jackie)', '(jaime)',
+    '(jira)', '(jobs)', '(joffrey)', '(jonsnow)', '(kennypowers)', '(krang)', '(kwanzaa)', '(lincoln)', '(lol)',
+    '(lolwut)', '(megusta)', '(menorah)', '(mindblown)', '(ned)', '(nextgendev)', '(ninja)', '(notbad)',
+    '(nothingtodohere)', '(notsureif)', '(notsureifgusta)', '(obama)', '(ohcrap)', '(ohgodwhy)', '(okay)', '(omg)',
+    '(oops)', '(orly)', '(pbr)', '(pete)', '(philosoraptor)', '(pingpong)', '(pirate)', '(pokerface)', '(poo)',
+    '(present)', '(pumpkin)', '(rageguy)', '(rebeccablack)', '(reddit)', '(romney)', '(rudolph)', '(sadpanda)',
+    '(sadtroll)', '(samuel)', '(santa)', '(scumbag)', '(seomoz)', '(shamrock)', '(shrug)', '(skyrim)', '(stare)',
+    '(stash)', '(success)', '(successful)', '(sweetjesus)', '(tableflip)', '(taft)', '(tea)', '(thumbsdown)',
+    '(thumbsup)', '(tree)', '(troll)', '(truestory)', '(trump)', '(turkey)', '(twss)', '(tyrion)', '(tywin)',
+    '(unknown)', '(washington)', '(wat)', '(wtf)', '(yey)', '(yodawg)', '(yougotitdude)', '(yuno)', '(zoidberg)',
+    '(zzz)', '8)', ':#', ':$', ':(', ':)', ':-*', ':D', ':Z', ':o', ':p', ':|', ';)', ';p', '>:-(', 'O:)']
 
 happyString = ['爽', '好笑', '笑死']
 sadString = ['受傷', '難過', '生病', '請假', 'Q_Q', 'QQ']
 angryString = ['gogobot*爛']
 
+
 def zhprint(obj):
     import re
+
     print re.sub(r"\\u([a-f0-9]{4})", lambda mg: unichr(int(mg.group(1), 16)), obj.__repr__())
 
 
-
-
-
-
 class ChitChat(BotPlugin):
-
     ''' Annoying chit chat plugin
     '''
     min_err_version = '1.6.0'  # Optional, but recommended
@@ -80,6 +87,8 @@ class ChitChat(BotPlugin):
     lastCheckTime = 0
     lastLunchTime = 0
     lastDinnerTime = 0
+
+    UpdateActionInterval = 3600
     LastUpdateTime = 0
 
     action_list = []
@@ -93,14 +102,13 @@ class ChitChat(BotPlugin):
         print currentTime
         print self.LastUpdateTime
 
+        difference = (currentTime - self.LastUpdateTime )
 
-        if  currentTime - self.LastUpdateTime >3600:
-            print 'last update > 3600, re-fetch from spreadsheet'
+        if difference > self.LastUpdateTime:
+            print 'last update > 3600, re-fetch from spreadsheet: ', difference
             self.action_list = getAction()
-            print 'action updated, total ',len(self.action_list) , 'action now'
-            self.LastUpdateTime =currentTime
-
-
+            print 'action updated, total ', len(self.action_list), 'action now'
+            self.LastUpdateTime = currentTime
 
 
     def saveHist(self, message, Msgfrom):
@@ -111,7 +119,7 @@ class ChitChat(BotPlugin):
             self.histMsg[self.histPisiton] = message
             self.histFrom[self.histPisiton] = Msgfrom
             print 'memory position: ', self.histPisiton
-            if self .histPisiton == MaxHistory - 1:
+            if self.histPisiton == MaxHistory - 1:
                 self.histPisiton = 0
             else:
                 self.histPisiton += 1
@@ -126,10 +134,11 @@ class ChitChat(BotPlugin):
 
     def getgirls(self, message):
         a = json.loads(
-            requests.get('http://curator.im/api/stream/?token=3b57cbb863364e9eb2f4cd7f833df331&page=' + str(int(random.random() * 140))).content)
+            requests.get('http://curator.im/api/stream/?token=3b57cbb863364e9eb2f4cd7f833df331&page=' + str(
+                int(random.random() * 140))).content)
         index = int(random.random() * 50)
         self.girl_source = "小海嚴選正妹 - " + \
-            a['results'][index]['name'] + " - " + a['results'][index]['url']
+                           a['results'][index]['name'] + " - " + a['results'][index]['url']
 
         return a['results'][index]['image']
 
@@ -163,19 +172,21 @@ class ChitChat(BotPlugin):
             requests.get('http://api.openweathermap.org/data/2.5/weather?q=taipei&lang=zh_tw').content)
 
         prefixArray = ['感謝@Duo大大，現在的天氣是', 'hihi~  現在的天氣是', '現在外面天氣是', '外面天氣', '現在外面天氣是', '外面天氣'
-                       '因為' + random.choice(self.histFrom) + '的關係，現在的天氣是']
+                                                                                         '因為' + random.choice(
+            self.histFrom) + '的關係，現在的天氣是']
         midfixArray = [' 氣溫是', ',溫度有', '，結果氣溫']
         subfixArray = [
-            '度', '度', '度', '度，真的不是人在待的', '度, 可去外面曬曬太陽',  '度, 意圖令人開冷氣', '度, 我都快熱當了!!', '']
+            '度', '度', '度', '度，真的不是人在待的', '度, 可去外面曬曬太陽', '度, 意圖令人開冷氣', '度, 我都快熱當了!!', '']
         msg = random.choice(prefixArray) + weather['weather'][0]['description'] + random.choice(
             midfixArray) + str((int(weather['main']['temp']) - 273.15)) + random.choice(subfixArray)
         self.send(self.mMessage.getFrom(), msg,
                   message_type=self.mMessage.getType())
 
-        if u"雨" in weather['weather'][0]['description'] or u"多雲" in weather['weather'][0]['description'] or u"晴" in weather['weather'][0]['description'] and (int(weather['main']['temp']) - 273.15) > 30:
+        if u"雨" in weather['weather'][0]['description'] or u"多雲" in weather['weather'][0]['description'] or u"晴" in \
+                weather['weather'][0]['description'] and (int(weather['main']['temp']) - 273.15) > 30:
             rainNoti = ['記得提醒@duo大大帶傘', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘',
                         '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！']
-            self.send(self.mMessage.getFrom(), random .choice(
+            self.send(self.mMessage.getFrom(), random.choice(
                 rainNoti), message_type=self.mMessage.getType())
 
     def showWeahterForcast(self):
@@ -205,27 +216,33 @@ class ChitChat(BotPlugin):
 
         midfixArray = [' 氣溫是', ',溫度有', '，結果氣溫']
         subfixArray = [
-            '度', '度', '度', '度，真的不是人在待的', '度, 可去外面曬曬太陽',  '度, 意圖令人開冷氣', '度, 我都快熱當了!!', '']
+            '度', '度', '度', '度，真的不是人在待的', '度, 可去外面曬曬太陽', '度, 意圖令人開冷氣', '度, 我都快熱當了!!', '']
 
-        msg = random.choice(prefixArray) + weatherToday['list'][forcastTimeZone]['weather'][0]['description'] + random.choice(
-            midfixArray) + str(int(weatherToday['list'][forcastTimeZone]['main']['temp']) - 273.15) + random.choice(subfixArray)
+        msg = random.choice(prefixArray) + weatherToday['list'][forcastTimeZone]['weather'][0][
+            'description'] + random.choice(
+            midfixArray) + str(int(weatherToday['list'][forcastTimeZone]['main']['temp']) - 273.15) + random.choice(
+            subfixArray)
         self.send(self.mMessage.getFrom(), msg,
                   message_type=self.mMessage.getType())
 
-        if u"雨" in weatherToday['list'][forcastTimeZone]['weather'][0]['description'] or u"多雲" in weatherToday['list'][forcastTimeZone]['weather'][0]['description'] or u"晴" in weatherToday['list'][forcastTimeZone]['weather'][0]['description'] and (int(weatherToday['list'][forcastTimeZone]['main']['temp']) - 273.15) > 30:
+        if u"雨" in weatherToday['list'][forcastTimeZone]['weather'][0]['description'] or u"多雲" in \
+                weatherToday['list'][forcastTimeZone]['weather'][0]['description'] or u"晴" in \
+                weatherToday['list'][forcastTimeZone]['weather'][0]['description'] and (
+                    int(weatherToday['list'][forcastTimeZone]['main']['temp']) - 273.15) > 30:
             rainNoti = ['記得提醒@duo大大帶傘', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘',
                         '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！']
-            self.send(self.mMessage.getFrom(), random .choice(
+            self.send(self.mMessage.getFrom(), random.choice(
                 rainNoti), message_type=self.mMessage.getType())
 
-        # in order to increase chitchat variety, bot will sometimes go off the
-        # rail and do something unexpected. sendRandomMessage() insure bot will
-        # reply something meaningless occasionally.
+            # in order to increase chitchat variety, bot will sometimes go off the
+            # rail and do something unexpected. sendRandomMessage() insure bot will
+            # reply something meaningless occasionally.
+
     def sendRandomMessage(self):
         if random.randrange(0, 101) > 98:
             print ' **send random message'
 
-            if random .randrange(0, 101) < 65:
+            if random.randrange(0, 101) < 65:
 
                 action = random.choice(self.action_list)
                 while 'commonDia' in action and action['commonDia'] == False:
@@ -243,10 +260,13 @@ class ChitChat(BotPlugin):
 
             else:
                 if random.randrange(0, 101) > 50:
-                    radReply = ['http://i.imgur.com/DJG1aF4.jpg', 'http://i.imgur.com/ggvWFBo.jpg', 'http://i.imgur.com/xovuE25.jpg'
-                                'http://i.imgur.com/uSGbEFG.jpg', 'http://i.imgur.com/mAuzhW9.jpg', 'http://i.imgur.com/8J0DPac.jpg',
+                    radReply = ['http://i.imgur.com/DJG1aF4.jpg', 'http://i.imgur.com/ggvWFBo.jpg',
+                                'http://i.imgur.com/xovuE25.jpg'
+                                'http://i.imgur.com/uSGbEFG.jpg', 'http://i.imgur.com/mAuzhW9.jpg',
+                                'http://i.imgur.com/8J0DPac.jpg',
 
-                                random.choice(self.histMsg), random.choice(self.histMsg), random.choice(self.histMsg), random.choice(self.histMsg), random.choice(self.histMsg), random.choice(self.histMsg)]
+                                random.choice(self.histMsg), random.choice(self.histMsg), random.choice(self.histMsg),
+                                random.choice(self.histMsg), random.choice(self.histMsg), random.choice(self.histMsg)]
 
                     response_messages = random.choice(radReply).split('*')
 
@@ -282,15 +302,15 @@ class ChitChat(BotPlugin):
             if random.randrange(0, 101) > 75:
                 self.angry += 3
                 response = ['可以不要洗版了嗎？', '洗版很好玩嗎？', '不要為了要我回文亂發言好嗎？']
-                self.send(self.mMessage.getFrom(), random .choice(
+                self.send(self.mMessage.getFrom(), random.choice(
                     response), message_type=self.mMessage.getType())
             else:
                 if random.randrange(0, 101) > 80:
                     self.angry += 2
                     self.happy += 3
                     for msg in self.histMsg:
-                        self.send(self.mMessage.getFrom(), random .choice(
-                                  self. histMsg), message_type=self.mMessage.getType())
+                        self.send(self.mMessage.getFrom(), random.choice(
+                            self.histMsg), message_type=self.mMessage.getType())
 
         return samePerson
 
@@ -300,13 +320,30 @@ class ChitChat(BotPlugin):
         print '*** lastCheckTime: ', self.lastCheckTime, ' ***'
 
     def checkIfContain(self, keyArray, message_string):
-        for tempString in keyArray:
-            keyArray = tempString .split('*')
+        # total key array
+        for key in keyArray:
+            keyArray_ = key.split('*')
             tempbool = True
 
-            for key in keyArray:
+            # must match every key in keyArray_
+            for key_ in keyArray_:
                 # print 'cheking key: ' + key
-                if message_string.find(key) == -1:
+                if 'randname' in key_:
+                    tempbool2 = False
+                    tempString = ''
+
+                    # match one of name in hisFrom
+                    for hisName in self.histFrom:
+                        tempString = key_.replace('randname', hisName)
+                        if tempString in message_string:
+                            tempbool2 = True
+                            break
+
+                    if tempbool2 != True:
+                        tempbool = False
+
+
+                elif not (key_ in message_string):
                     # print 'do not contain ' + key
                     tempbool = False
                     break
@@ -315,6 +352,7 @@ class ChitChat(BotPlugin):
                 return True
         return False
 
+    # check if people speak in bad temper,
     def checkBadPeople(self, message_string):
 
         badEnding = [u'拉', u'啦', u'辣']
@@ -353,7 +391,7 @@ class ChitChat(BotPlugin):
             self.angry = 0
         if self.sad < 0:
             self.sad = 0
-        if self .happy < 0:
+        if self.happy < 0:
             self.happy = 0
         self.lastCheckTime = int(time.time())
 
@@ -374,9 +412,6 @@ class ChitChat(BotPlugin):
             self.angry += 1
 
 
-
-
-
     @botcmd
     def look(self, message, args):
         ''' send gogolook emoji when received command look
@@ -386,25 +421,30 @@ class ChitChat(BotPlugin):
                   message_type=message.getType())
 
     def callback_message(self, connection, message):
-        ''' Triggered for every received message that isn't coming
-            from the bot itself
-        '''
 
-        print 'current hour:' + time.strftime("%H")
 
         message_string = message.getBody().lower()
         message_from = message.getFrom().getResource()
         self.mMessage = message
 
-        self.checkUpdateKeyword()
+
+        # non-gogobot response part, maybe custom gogobot command or some bug proof.
 
         if message_from == 'Gogo Bot':
             return
+
+        # reload all action list
+        if 'reload actionlist' in message_string:
+            self.lastCheckTime = 0
+
+        self.checkUpdateKeyword()
 
         self.saveHist(message_string, message_from)
 
 
 
+
+        # The following define how gogobot response
 
         # action can now support multiple keyword and multi-line message
         #
@@ -412,10 +452,10 @@ class ChitChat(BotPlugin):
         # or the keyword may never match
         #
         # action_list.append({
-        #     'keyword': ['keyword','keyword*keyword2']
-        #     'response': ['message1',
-        #         'message2_line1*message2_line2'
-        #     ], 'chance': chance_int (%)
+        # 'keyword': ['keyword','keyword*keyword2']
+        # 'response': ['message1',
+        # 'message2_line1*message2_line2'
+        # ], 'chance': chance_int (%)
         # })
 
         # 亂回機制1
@@ -464,8 +504,8 @@ class ChitChat(BotPlugin):
 
                 if 'chance' in action:
                     if ShowCompareLog:
-                        zhprint( ' ** '+ action['keyword'] +'has "roll" key, have to roll ')
-                    if random .randrange(0, 101) < action['chance']:
+                        zhprint(' ** ' + ''.join(action['keyword']) + 'has "roll" key, have to roll ')
+                    if random.randrange(0, 101) < action['chance']:
                         if ShowCompareLog:
                             print ' **rand < ', action['chance'], ', roll success!!'
                         totalMessage = random.choice(action['response'])
@@ -486,11 +526,15 @@ class ChitChat(BotPlugin):
                     response_messages = totalMessage.split('*')
 
                     for msg in response_messages:
+
+                        response_messages = response_messages.replace('randname', random.choice(self.histFrom))
+                        response_messages = response_messages.replace('randmsg', random.choice(self.histFrom))
+
                         self.send(message.getFrom(),
                                   msg,
                                   message_type=message.getType())
                         if ShowCompareLog:
-                            zhprint( 'message "'+ response_messages+ '" sended')
+                            zhprint('message "' + response_messages + '" sended')
 
                     return
 
