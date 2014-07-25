@@ -31,7 +31,7 @@ sys.setdefaultencoding("utf-8")
 ShowCompareLog = True
 ShowEmoLog = False
 ShowTalkHis = True
-MaxHistory = 10
+MaxHistory = 6
 LastUpdateTime = 0
 
 emoji = [
@@ -98,9 +98,6 @@ class ChitChat(BotPlugin):
 
     def checkUpdateKeyword(self):
         currentTime = int(time.time())
-
-        print currentTime
-        print self.LastUpdateTime
 
         difference = (currentTime - self.LastUpdateTime )
 
@@ -238,7 +235,7 @@ class ChitChat(BotPlugin):
             # rail and do something unexpected. sendRandomMessage() insure bot will
             # reply something meaningless occasionally.
 
-    def sendRandomMessage(self):
+    def checkSendRandomMessage(self):
         if random.randrange(0, 101) > 98:
             print ' **send random message'
 
@@ -411,6 +408,19 @@ class ChitChat(BotPlugin):
                 print 'angry str matched: ' + message_string
             self.angry += 1
 
+    def checkGogobotCmd(self, message):
+
+        # reload all action list
+        if 'gogoreload' in message:
+            print 'cmd received, try to reload'
+            self.LastUpdateTime = 0
+            return
+
+        if 'gogoreset' in message:
+            print 'reset his memory'
+            self.histFrom = []
+            self.histMsg = []
+
 
     @botcmd
     def look(self, message, args):
@@ -419,6 +429,7 @@ class ChitChat(BotPlugin):
         self.send(message.getFrom(),
                   '(gogolook)',
                   message_type=message.getType())
+
 
     def callback_message(self, connection, message):
 
@@ -433,10 +444,7 @@ class ChitChat(BotPlugin):
         if message_from == 'Gogo Bot':
             return
 
-        # reload all action list
-        if 'reload actionlist' in message_string:
-            self.lastCheckTime = 0
-
+        self.checkGogobotCmd(message_string)
         self.checkUpdateKeyword()
 
         self.saveHist(message_string, message_from)
@@ -458,8 +466,13 @@ class ChitChat(BotPlugin):
         # ], 'chance': chance_int (%)
         # })
 
-        # 亂回機制1
-        if self.sendRandomMessage():
+        # random response #1
+        if self.checkSendRandomMessage():
+            return
+
+            # do not trigger on links
+        if 'http:' in message_string or 'https:' in message_string:
+            self.checkSendRandomMessage(self.action_list)
             return
 
         if self.checkBadPeople(message_string):
@@ -488,10 +501,7 @@ class ChitChat(BotPlugin):
             print '*** message received, try to responese ***'
             print 'message: ', message_string
 
-        # do not trigger on links
-        if 'http:' in message_string or 'https:' in message_string:
-            self.sendRandomMessage(self.action_list)
-            return
+
 
         # start to search if it match any keyword in action_list
         for action in self.action_list:
@@ -512,6 +522,11 @@ class ChitChat(BotPlugin):
                         response_messages = totalMessage.split('*')
 
                         for msg in response_messages:
+
+
+                            msg = msg.replace('randname', random.choice(self.histFrom))
+                            msg = msg.replace('randmsg', random.choice(self.histMsg))
+
                             self.send(message.getFrom(),
                                       msg,
                                       message_type=message.getType())
@@ -527,8 +542,8 @@ class ChitChat(BotPlugin):
 
                     for msg in response_messages:
 
-                        response_messages = response_messages.replace('randname', random.choice(self.histFrom))
-                        response_messages = response_messages.replace('randmsg', random.choice(self.histFrom))
+                        msg = msg.replace('randname', random.choice(self.histFrom))
+                        msg = msg.replace('randmsg', random.choice(self.histMsg))
 
                         self.send(message.getFrom(),
                                   msg,
@@ -538,7 +553,7 @@ class ChitChat(BotPlugin):
 
                     return
 
-        # 亂回機制2
-        if self.sendRandomMessage():
+        # random response #2
+        if self.checkSendRandomMessage():
             return
 
