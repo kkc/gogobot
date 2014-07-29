@@ -472,7 +472,7 @@ class ChitChat(BotPlugin):
 
             # do not trigger on links
         if 'http:' in message_string or 'https:' in message_string:
-            self.checkSendRandomMessage(self.action_list)
+            self.checkSendRandomMessage()
             return
 
         if self.checkBadPeople(message_string):
@@ -515,7 +515,7 @@ class ChitChat(BotPlugin):
                 if 'chance' in action:
                     if ShowCompareLog:
                         zhprint(' ** ' + ''.join(action['keyword']) + 'has "roll" key, have to roll ')
-                    if random.randrange(0, 101) < action['chance']:
+                    if random.randrange(0, 101) < int(action['chance']):
                         if ShowCompareLog:
                             print ' **rand < ', action['chance'], ', roll success!!'
                         totalMessage = random.choice(action['response'])
