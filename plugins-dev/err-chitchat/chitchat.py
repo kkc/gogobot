@@ -71,7 +71,7 @@ class ChitChat(BotPlugin):
     ''' Annoying chit chat plugin
     '''
     min_err_version = '1.6.0'  # Optional, but recommended
-    max_err_version = '2.0.0'  # Optional, but recommended
+    max_err_version = '2.1.0'  # Optional, but recommended
     decayValue = 20
     girl_source = ''
 
