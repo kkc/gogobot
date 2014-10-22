@@ -16,6 +16,7 @@ Just messing around~
 
 import json
 import random
+
 import sys
 import time
 
@@ -27,10 +28,6 @@ from copy_strings import getAction
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-# constants
-ShowCompareLog = True
-ShowEmoLog = False
-ShowTalkHis = True
 MaxHistory = 6
 LastUpdateTime = 0
 
@@ -88,6 +85,12 @@ class ChitChat(BotPlugin):
     lastLunchTime = 0
     lastDinnerTime = 0
 
+
+    # constants
+    ShowCompareLog = True
+    ShowEmoLog = False
+    ShowTalkHis = True
+
     UpdateActionInterval = 3600
     LastUpdateTime = 0
 
@@ -95,6 +98,18 @@ class ChitChat(BotPlugin):
 
     hatedPeopleName = ''
     likePeopleName = ''
+
+    noteList = []
+
+
+    def loadCurrentNote(self):
+        file = open('user/Document/gogobot/gogobot.sav', 'w+')
+
+
+    def saveCurrentNote(self):
+        file = open('user/Document/gogobot/gogobot.sav', 'w+')
+        jsonFile = json.load(file)
+
 
     def checkUpdateKeyword(self):
         currentTime = int(time.time())
@@ -120,7 +135,7 @@ class ChitChat(BotPlugin):
                 self.histPisiton = 0
             else:
                 self.histPisiton += 1
-        if ShowTalkHis:
+        if self.ShowTalkHis:
             print '**** print hist msg ****'
             for msg in self.histMsg:
                 print msg
@@ -153,13 +168,14 @@ class ChitChat(BotPlugin):
         else:
 
             if self.checkIfContain([u'天氣', u'氣溫'], message_string):
-                otherDes = [u'早上', u'晚上', u'飯', u'上班', u'餐', u'下班', u'出門']
+                # otherDes = [u'早上', u'晚上', u'飯', u'上班', u'餐', u'下班', u'出門']
+                #
+                # print 'check weather roll success, keyword matched'
+                # if self.prevContain(otherDes) or self.checkIfContain(otherDes, message_string):
+                #     self.showWeahterForcast()
+                # else:
 
-                print 'check weather roll success, keyword matched'
-                if self.prevContain(otherDes) or self.checkIfContain(otherDes, message_string):
-                    self.showWeahterForcast()
-                else:
-                    self.showWeahterNow()
+                self.showWeahterForcast()
 
                 return True
             return False
@@ -298,7 +314,7 @@ class ChitChat(BotPlugin):
         if samePerson:
             if random.randrange(0, 101) > 75:
                 self.angry += 3
-                response = ['可以不要洗版了嗎？', '洗版很好玩嗎？', '不要為了要我回文亂發言好嗎？']
+                response = ['可以不要洗版了嗎？', '洗版很好玩嗎？', '不要為了要我回文亂發言好嗎？', '人的忍耐是有限度的！']
                 self.send(self.mMessage.getFrom(), random.choice(
                     response), message_type=self.mMessage.getType())
             else:
@@ -376,7 +392,7 @@ class ChitChat(BotPlugin):
         currentTime = int(time.time())
         timeDiff = currentTime - self.lastCheckTime
 
-        if ShowEmoLog:
+        if self.ShowEmoLog:
             print (timeDiff), 'passed since last update'
 
         self.happy -= self.decayValue * timeDiff / 3600
@@ -394,17 +410,17 @@ class ChitChat(BotPlugin):
 
         # update emo with new input
         if self.checkIfContain(happyString, message_string):
-            if ShowEmoLog:
+            if self.ShowEmoLog:
                 print 'happy str matched: ' + message_string
             self.happy += 1
 
         if self.checkIfContain(sadString, message_string):
-            if ShowEmoLog:
+            if self.ShowEmoLog:
                 print 'sad str matched: ' + message_string
             self.sad += 1
 
         if self.checkIfContain(angryString, message_string):
-            if ShowEmoLog:
+            if self.ShowEmoLog:
                 print 'angry str matched: ' + message_string
             self.angry += 1
 
@@ -414,12 +430,33 @@ class ChitChat(BotPlugin):
         if 'gogoreload' in message:
             print 'cmd received, try to reload'
             self.LastUpdateTime = 0
+            self.send = self.send(self.mMessage.getFrom(), 'command received, reloading',
+                                  message_type=self.mMessage.getType())
+
             return
 
         if 'gogoreset' in message:
             print 'reset his memory'
             self.histFrom = []
             self.histMsg = []
+            self.send(self.mMessage.getFrom(), 'command received, history is now clean',
+                      message_type=self.mMessage.getType())
+
+        if 'gogoshowcompare' in message:
+            if self.ShowCompareLog == True:
+                self.ShowCompareLog = False
+            else:
+                self.ShowCompareLog = True
+
+        if 'gogoshowhist' in message:
+            if self.ShowTalkHis == True:
+                self.ShowTalkHis = False
+            else:
+                self.ShowTalkHis = True
+
+        if 'gogotest' in message:
+            self.send(self.mMessage.getFrom(), '@NickJian',
+                      message_type=self.mMessage.getType())
 
 
     @botcmd
@@ -431,6 +468,22 @@ class ChitChat(BotPlugin):
                   message_type=message.getType())
 
 
+    # def checkWantRemind(self, message):
+    # if u'提醒我' in message:
+    # message.replace(u'提醒我', '')
+    # if u'點' in message or u'分' in message:
+    #             message.
+    #
+    #
+    #         else:
+    #             self.send(self.mMessage.getFrom(), random.choice(
+    #                 '你沒說時間啊？'), message_type=self.mMessage.getType())
+    #     else:
+    #         return False
+
+
+
+
     def callback_message(self, connection, message):
 
 
@@ -439,7 +492,7 @@ class ChitChat(BotPlugin):
         self.mMessage = message
 
 
-        # non-gogobot response part, maybe custom gogobot command or some bug proof.
+        # non-gogobot response part, maybe custom gogobot command or some bug proof code.
 
         if message_from == 'Gogo Bot':
             return
@@ -466,6 +519,10 @@ class ChitChat(BotPlugin):
         # ], 'chance': chance_int (%)
         # })
 
+
+        # if self.checkWantRemind(message_string):
+        #     return
+
         # random response #1
         if self.checkSendRandomMessage():
             return
@@ -489,15 +546,15 @@ class ChitChat(BotPlugin):
         if self.antiWash():
             return
 
-        if ShowEmoLog:
+        if self.ShowEmoLog:
             print 'emotion before update'
             self.printCurrentEmotion()
         self.updateCurrentEmotion(message_string)
-        if ShowEmoLog:
+        if self.ShowEmoLog:
             print 'emotion after update'
             self.printCurrentEmotion()
 
-        if ShowCompareLog:
+        if self.ShowCompareLog:
             print '*** message received, try to responese ***'
             print 'message: ', message_string
 
@@ -505,18 +562,18 @@ class ChitChat(BotPlugin):
 
         # start to search if it match any keyword in action_list
         for action in self.action_list:
-            if ShowCompareLog:
+            if self.ShowCompareLog:
                 print 'see if matched keyword type: ', action['keyword'][0]
 
             if self.checkIfContain(action['keyword'], message_string):
-                if ShowCompareLog:
+                if self.ShowCompareLog:
                     print ' **"', action['keyword'][0], '" matched'
 
                 if 'chance' in action:
-                    if ShowCompareLog:
+                    if self.ShowCompareLog:
                         zhprint(' ** ' + ''.join(action['keyword']) + 'has "roll" key, have to roll ')
                     if random.randrange(0, 101) < int(action['chance']):
-                        if ShowCompareLog:
+                        if self.ShowCompareLog:
                             print ' **rand < ', action['chance'], ', roll success!!'
                         totalMessage = random.choice(action['response'])
                         response_messages = totalMessage.split('*')
@@ -524,16 +581,18 @@ class ChitChat(BotPlugin):
                         for msg in response_messages:
 
 
-                            msg = msg.replace('randname', random.choice(self.histFrom))
+                            msg = msg.replace('randname', '@'+random.choice(self.histFrom))
                             msg = msg.replace('randmsg', random.choice(self.histMsg))
 
                             self.send(message.getFrom(),
                                       msg,
                                       message_type=message.getType())
-                            if ShowCompareLog:
+                
+
+                            if self.ShowCompareLog:
                                 print ' **message "', response_messages, '" sended'
                         return
-                    elif ShowCompareLog:
+                    elif self.ShowCompareLog:
                         print ' **rand > ', action['chance'], ', roll failed!'
 
                 else:
@@ -548,7 +607,7 @@ class ChitChat(BotPlugin):
                         self.send(message.getFrom(),
                                   msg,
                                   message_type=message.getType())
-                        if ShowCompareLog:
+                        if self.ShowCompareLog:
                             zhprint('message "' + response_messages + '" sended')
 
                     return
