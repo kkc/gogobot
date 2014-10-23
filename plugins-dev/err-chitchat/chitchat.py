@@ -125,7 +125,7 @@ class ChitChat(BotPlugin):
         def checkTime(self, hour, min):
             mHour = datetime.datetime.now().hour
             mMinute = datetime.datetime.now().minute
-            if mHour >= hour and mHour < hour + 1 and mMinute >= min and mMinute < min + (timeGap / 60) + 1:
+            if mHour >= hour and mHour < hour + 1 and mMinute >= min and mMinute < min + (timeGap / 60) :
                 return True
             else:
                 return False
@@ -320,7 +320,7 @@ class ChitChat(BotPlugin):
             self.histFrom) + '的關係，現在的天氣是']
         midfixArray = [' 氣溫是', ',溫度有', '，結果氣溫']
         subfixArray = [
-            '度', '度', '度', '度，真的不是人在待的', '度, 可去外面曬曬太陽', '度, 意圖令人開冷氣', '度, 我都快熱當了!!', '']
+            '度', '度', '度', '度，真的不是人在待的', '度, 可去外面曬曬太陽', '度, 意圖令人開冷氣', '度, 我都快熱當了!!', '有夠冷', '令人打了個韓戰', '記得多加件外套', '度，外出多加注意歐', '度，不要忘了防曬歐', '度，真是冷死人了', '度，不是很適合出門', '，真想待在家裡不出門....', '', '', '']
         msg = random.choice(prefixArray) + weather['weather'][0]['description'] + random.choice(
             midfixArray) + str((int(weather['main']['temp']) - 273.15)) + random.choice(subfixArray)
         self.send(mMessage.getFrom(), msg,
