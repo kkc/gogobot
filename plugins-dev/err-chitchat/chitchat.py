@@ -29,7 +29,7 @@ from copy_strings import getAction
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-MaxHistory = 20
+MaxHistory = 40
 LastUpdateTime = 0
 
 emoji = [
@@ -48,7 +48,7 @@ emoji = [
     '(nothingtodohere)', '(notsureif)', '(notsureifgusta)', '(obama)', '(ohcrap)', '(ohgodwhy)', '(okay)', '(omg)',
     '(oops)', '(orly)', '(pbr)', '(pete)', '(philosoraptor)', '(pingpong)', '(pirate)', '(pokerface)', '(poo)',
     '(present)', '(pumpkin)', '(rageguy)', '(rebeccablack)', '(reddit)', '(romney)', '(rudolph)', '(sadpanda)',
-    '(sadtroll)', '(samuel)', '(santa)', '(scumbag)', '(seomoz)', '(shamrock)', '(shrug)', '(skyrim)', '(stare)',
+    '(sadtroll)', '(samuel)', '(santa)', '(scumbag)', '(seamoz)', '(shamrock)', '(shrug)', '(skyrim)', '(stare)',
     '(stash)', '(success)', '(successful)', '(sweetjesus)', '(tableflip)', '(taft)', '(tea)', '(thumbsdown)',
     '(thumbsup)', '(tree)', '(troll)', '(truestory)', '(trump)', '(turkey)', '(twss)', '(tyrion)', '(tywin)',
     '(unknown)', '(washington)', '(wat)', '(wtf)', '(yey)', '(yodawg)', '(yougotitdude)', '(yuno)', '(zoidberg)',
@@ -130,6 +130,12 @@ class ChitChat(BotPlugin):
             else:
                 return False
 
+        def isWorkingDay(self):
+             if datetime.datetime.today().weekday() == 6 or  datetime.datetime.today().weekday() == 5:
+                 return  False
+             else :
+                 return  True
+
 
         def run(self):
             while (True):
@@ -144,7 +150,7 @@ class ChitChat(BotPlugin):
                                         message_type='groupchat')
 
                 # weather forecast
-                if self.checkTime(9, 10) or self.checkTime(12, 30) or self.checkTime(19, 10):
+                if ( self.checkTime(9, 10) or self.checkTime(12, 30) or self.checkTime(19, 10)) and self.isWorkingDay() :
                     print 'show weather forecast reminder'
                     self.mChitChat.showWeahterForcast()
 
@@ -157,12 +163,14 @@ class ChitChat(BotPlugin):
                     for msg in self.mChitChat.histMsg:
                         if 'lighting' in msg or 'meetup' in msg:
 
-                            print 'hist has meetup info:'
+                            print '== following is hist has meetup info=='
                             zhprint(msg)
 
                             if len(msg) > longestMsgLength:
                                 longestMsgLength = len(msg)
                                 longestMsg = msg
+
+                    print '== hist end =='
 
                     # has announced meetup topic
                     if longestMsgLength > 20:
@@ -188,14 +196,14 @@ class ChitChat(BotPlugin):
 
 
                 # lunch time
-                if self.checkTime(12, 30) and random.randrange(0, 101) < 30:
+                if self.checkTime(12, 30) and random.randrange(0, 101) < 30  and self.isWorkingDay():
                     askMsg = ['吃飯啊', '走了 吃飯啊', '吃飯吃飯', '吃飯吃飯吃飯吃飯吃飯', '有人要吃飯', '吃飯摟', '要吃飯', '誰要吃飯？ 幫我買便當', '該吃飯摟',
                               '吃飯八', '要不要先吃飯', '有人要吃東西嗎']
                     self.mChitChat.send('62755_gogolook_developers@conf.hipchat.com', random.choice(askMsg),
                                         message_type='groupchat')
 
-                # auto talk
-                if (int(time.time()) - mMessageTime) > 3600 * 24 and datetime.datetime.now().hour > 10 and datetime.datetime.now().hour < 20:
+                # auto talkonButtonClickListener
+                if (int(time.time()) - mMessageTime) > 3600 * 20 and datetime.datetime.now().hour > 10 and datetime.datetime.now().hour < 20 and random.randrange(0, 101) < 3 and self.isWorkingDay():
                     askMsg = ['吃飯啊', '走了 吃飯啊', '有人要吃東西嗎', '吃飯吃飯吃飯吃飯吃飯', '都沒有人要跟我完', '有人在嗎？？', '幫我開門', '肚子餓了', '大家還在嗎？',
                               '怎麼這麼久都沒有人留言？', '大家好，我是googbot', '都沒人留言 大家都放假去了嗎？', '今天天氣不錯']
                     self.mChitChat.send('62755_gogolook_developers@conf.hipchat.com', random.choice(askMsg),
@@ -267,12 +275,21 @@ class ChitChat(BotPlugin):
             else:
                 self.histPisiton += 1
         if self.ShowTalkHis:
-            print '**** print hist msg ****'
+
+            histMsg =[]
+
+
             for msg in self.histMsg:
-                print msg
-            print '**** print hist name ****'
+                histMsg.append(msg)
+
+            i=0
             for name in self.histFrom:
-                print name
+                histMsg[i] = name + ' said:  '+histMsg[i]
+                i=i+1
+
+            for msg in histMsg:
+                zhprint(msg)
+
             print '**** end of hist ****'
 
     def getgirls(self, message):
@@ -696,11 +713,19 @@ class ChitChat(BotPlugin):
             print 'message: ', message_string
 
 
+        counter =0
+        Appendedkeyword =''
 
         # start to search if it match any keyword in action_list
         for action in self.action_list:
             if self.ShowCompareLog:
-                print 'see if matched keyword type: ', action['keyword'][0]
+                if counter <10:
+                    counter=counter+1
+                    Appendedkeyword = Appendedkeyword+action['keyword'][0]+",  "
+                else :
+                    print 'chcecking keyword type: ', Appendedkeyword
+                    counter =0
+                    Appendedkeyword=' '
 
             if self.checkIfContain(action['keyword'], message_string):
                 if self.ShowCompareLog:
@@ -755,4 +780,6 @@ class ChitChat(BotPlugin):
         if self.checkSendRandomMessage():
             return
 
+        if self.ShowCompareLog and counter!=0:
+            print 'chcecking keyword type: ', Appendedkeyword
 
