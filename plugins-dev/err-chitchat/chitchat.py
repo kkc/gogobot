@@ -149,7 +149,7 @@ class ChitChat(BotPlugin):
                 if self.checkTime(12, 0) or self.checkTime(18, 0):
                     print 'show eat meat reminder'
 
-                    rpyMsg = ['/me 溫馨提示 大家，可以吃肉了！！', '/me 默默的打開刀塔吃肉', '/me 表示： 親！吃肉時間已經到了，不要犧牲你的權益', '大家該吃肉了！！！']
+                    rpyMsg = ['/me 溫馨提示 大家，可以吃肉了！！', '/me 默默的打開刀塔吃肉', '/me 表示： 親！吃肉時間已經到了，不要犧牲你的權益', '大家該吃肉了！！！','/me 表示：(turkey) 親！吃肉時間已經到了', '/me 表示：(turkey) 您有一份豪華午餐尚未領取！','大家該吃肉了！！！','(turkey) 豪華午餐已經準備好了']
                     self.mChitChat.send('62755_gogolook_developers@conf.hipchat.com', random.choice(rpyMsg),
                                         message_type='groupchat')
 
@@ -282,11 +282,11 @@ class ChitChat(BotPlugin):
                 self.histPisiton += 1
         if self.ShowTalkHis:
 
+            print '**** printing hist msg ****'
             histMsg = []
 
             for msg in self.histMsg:
                 histMsg.append(msg)
-
             i = 0
             for name in self.histFrom:
                 histMsg[i] = name + ' said:  ' + histMsg[i]
