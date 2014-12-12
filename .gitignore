@@ -53,3 +53,5 @@ vcs.xml
 .idea/misc.xml
 .idea/modules.xml
 .DS_Store
+
+*.log

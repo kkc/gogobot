@@ -679,7 +679,7 @@ class ChitChat(BotPlugin):
 
         # non-gogobot response part, maybe custom gogobot command or some bug proof code.
         self.checkGogobotCmd(message_string)
-        self.checkUpdateKeyword()
+#        self.checkUpdateKeyword()
 
         self.saveHist(message_string, message_from)
 

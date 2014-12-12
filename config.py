@@ -64,15 +64,15 @@ BOT_ASYNC = True
 # The identity, or credentials, used to connect to a server
 BOT_IDENTITY = {
     # XMPP (Jabber) mode
-    # u'username': u'err@localhost',  # The JID of the user you have created for the bot
-    # u'password': u'changeme',       # The corresponding password for this user
+    u'username': u'gogobot@gogolook.xmpp.slack.com',  # The JID of the user you have created for the bot
+    u'password': u'gogolook.irDP3gA9R4lR1k4FEjVX',       # The corresponding password for this user
 
     ## HipChat mode (Comment the above if using this mode)
-    'username' : u'62755_595125@chat.hipchat.com',
-    'password' : u'F17DE1FC-04E5-4299-8406-50FF796320E8',
+    # 'username' : u'62755_595125@chat.hipchat.com',
+    # 'password' : u'F17DE1FC-04E5-4299-8406-50FF796320E8',
     ## Group admins can create/view tokens on the settings page after logging
     ## in on HipChat's website
-    'token' : u'ff1d329747dc86602995b37c448e3f',
+    # 'token' : u'ff1d329747dc86602995b37c448e3f',
 
     ## Campfire mode (Comment the others above if using this mode)
     # 'subdomain': 'yatta',
@@ -94,21 +94,21 @@ BOT_IDENTITY = {
 # Note: With campfire this should be the full name of a person, like so:
 # BOT_ADMINS = ('Guillaume Binet',)
 #
-BOT_ADMINS = ('62755_433911@chat.hipchat.com','62755_675759@chat.hipchat.com',)
+BOT_ADMINS = ('gogobot@gogolook.xmpp.slack.com','gogolook.irDP3gA9R4lR1k4FEjVX')
 
 # Chatrooms your bot should join on startup. For the IRC backend you
 # should include the # sign here. For XMPP rooms that are password
 # protected, you can specify another tuple here instead of a string,
 # using the format (RoomName, Password).
-CHATROOM_PRESENCE = [(u'62755_gogolook_developers@conf.hipchat.com',''), \
-                     (u'62755_area51@conf.hipchat.com','')]
+CHATROOM_PRESENCE = [(u'gogobot-dev@conference.gogolook.xmpp.slack.com'),
+                    (u'general@conference.gogolook.xmpp.slack.com')]
 
 # The FullName, or nickname, your bot should use. What you set here will
 # be the nickname that Err shows in chatrooms. Note that some XMPP
 # implementations, notably HipChat, are very picky about what name you
 # use. In the case of HipChat, make sure this matches exactly with the
 # name you gave the user.
-CHATROOM_FN = u'Gogo Bot'
+CHATROOM_FN = u'gogobot'
 
 ##########################################################################
 # Prefix configuration                                                   #
