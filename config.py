@@ -100,8 +100,8 @@ BOT_ADMINS = ('gogobot@gogolook.xmpp.slack.com','gogolook.irDP3gA9R4lR1k4FEjVX')
 # should include the # sign here. For XMPP rooms that are password
 # protected, you can specify another tuple here instead of a string,
 # using the format (RoomName, Password).
-CHATROOM_PRESENCE = [(u'gogobot-dev@conference.gogolook.xmpp.slack.com'),
-                    (u'general@conference.gogolook.xmpp.slack.com')]
+CHATROOM_PRESENCE = [(u'general@conference.gogolook.xmpp.slack.com'),
+                     (u'gogobot-dev@conference.gogolook.xmpp.slack.com')]
 
 # The FullName, or nickname, your bot should use. What you set here will
 # be the nickname that Err shows in chatrooms. Note that some XMPP
