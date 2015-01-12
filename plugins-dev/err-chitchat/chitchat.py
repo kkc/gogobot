@@ -127,7 +127,7 @@ class ChitChat(BotPlugin):
 
 
         def checkTime(self, hour, min):
-            mHour = datetime.datetime.now().hour
+            mHour = datetime.datetime.now().hour+8
             mMinute = datetime.datetime.now().minute
             if mHour >= hour and mHour < hour + 1 and mMinute >= min and mMinute < min + (timeGap / 60):
                 return True
@@ -269,6 +269,8 @@ class ChitChat(BotPlugin):
 
 
     def saveHist(self, message, Msgfrom):
+        if not message or not Msgfrom:
+            return
         if len(self.histMsg) < MaxHistory:
             self.histMsg.append(message)
             self.histFrom.append(Msgfrom)
@@ -289,6 +291,7 @@ class ChitChat(BotPlugin):
                 histMsg.append(msg)
             i = 0
             for name in self.histFrom:
+                print name
                 histMsg[i] = name + ' said:  ' + histMsg[i]
                 i = i + 1
 
@@ -662,6 +665,8 @@ class ChitChat(BotPlugin):
         message_string = message.getBody().lower()
         message_from = message.getFrom().getResource()
 
+        if not message_from or not message_string:
+            return
         if message_from == 'Gogo Bot':
             return
 
@@ -679,7 +684,7 @@ class ChitChat(BotPlugin):
 
         # non-gogobot response part, maybe custom gogobot command or some bug proof code.
         self.checkGogobotCmd(message_string)
-#        self.checkUpdateKeyword()
+        self.checkUpdateKeyword()
 
         self.saveHist(message_string, message_from)
 

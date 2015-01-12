@@ -13,7 +13,7 @@ def zhprint(obj):
 
 
 def refreshData(dataList, initColumn):
-    gc = gspread.login('gogobot5566', 'whoscall123')
+    gc = gspread.login('gogobot5566', 'ilovegogobot')
     if initColumn ==0:
         wks = gc.open('gogobotThinkBrian').get_worksheet(1)
     else:
