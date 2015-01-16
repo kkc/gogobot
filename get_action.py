@@ -5,6 +5,7 @@ import gspread
 
 
 ColumnCount = 5
+show_import_star_log = False
 
 
 def zhprint(obj):
@@ -13,6 +14,7 @@ def zhprint(obj):
     print re.sub(r"\\u([a-f0-9]{4})", lambda mg: unichr(int(mg.group(1), 16)), obj.__repr__())
 
 
+# calculate star level, the keyword which has higher star level will be more difficult to be triggered and should be put at head of list
 def getStarCount(list):
     total_star_count = 0
     max_star = 0
@@ -22,7 +24,7 @@ def getStarCount(list):
             max_star = text.count('*')
         total_star_count += text.count('*')
         keyword_count += 1
-    return int(round((max_star + total_star_count) * 10 / keyword_count))
+    return int(round((max_star + total_star_count) * 30 / keyword_count) + keyword_count)
 
 
 def refreshData(dataList, initColumn):
@@ -74,9 +76,9 @@ def refreshData(dataList, initColumn):
                 is_inserted = False
 
                 for i in range(0, len(dataList)):
-                    print(
-                        'mStar count: ', star_count, 'dataList ', i, ' starCount: ',
-                        getStarCount(dataList[i]['keyword']))
+                    global show_import_star_log
+                    if show_import_star_log:
+                        print( 'mStar count: ', star_count, 'dataList ', i, ' starCount: ', getStarCount(dataList[i]['keyword']))
 
                     received_data = dataList[i]
                     if getStarCount(received_data['keyword']) <= star_count:
@@ -100,9 +102,8 @@ def refreshData(dataList, initColumn):
 def getAction():
     dataList = []
 
-    # load contributed data first
-    # refreshData(dataList, 1)
     refreshData(dataList, 0)
+    refreshData(dataList, 1)
 
     return dataList
 
