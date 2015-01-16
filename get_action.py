@@ -6,6 +6,7 @@ import gspread
 
 ColumnCount = 5
 show_import_star_log = False
+show_log =False
 
 
 def zhprint(obj):
@@ -46,7 +47,8 @@ def refreshData(dataList, initColumn):
     try:
         for r in range(1, rowCount):
 
-            print '*** getting row:', r, ' ***'
+            if show_log:
+                print '*** getting row:', r, ' ***'
 
             newData = {}
             newData['keyword'] = []
@@ -69,7 +71,8 @@ def refreshData(dataList, initColumn):
             else:
                 newData['commonDia'] = False
 
-            zhprint(newData)
+            if show_log:
+                zhprint(newData)
 
             if len(newData['response']) > 0 and len(newData['keyword']) > 0 and newData['chance'] > 0:
                 star_count = getStarCount(newData['response'])
@@ -89,7 +92,8 @@ def refreshData(dataList, initColumn):
                 if not is_inserted:
                     dataList.insert(len(dataList), newData)
 
-                print 'data received'
+                if show_log:
+                    print 'data received'
             else:
                 print '*** invalid data, dropped ***'
 
