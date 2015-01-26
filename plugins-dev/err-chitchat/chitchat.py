@@ -137,15 +137,19 @@ class ChitChat(BotPlugin):
     # mSelf =''
 
     def send_from_messages(self, message_list):
-        msg = random.choice(message_list)
 
-        msg = msg.replace('randname', '@' + random.choice(self.histFrom).replace(' ', ''))
-        msg = msg.replace('randmsg', random.choice(self.histMsg))
 
-        self.send(mMessage.getFrom(), msg, message_type=mMessage.getType())
+        for msg in message_list:
 
-        if self.ShowCompareLog:
-            zhprint(' **message "' + msg + '" sended')
+            time.sleep(random.uniform(0,5))
+
+            msg = msg.replace('randname', '@' + random.choice(self.histFrom).replace(' ', ''))
+            msg = msg.replace('randmsg', random.choice(self.histMsg))
+
+            self.send(mMessage.getFrom(), msg, message_type=mMessage.getType())
+
+            if self.ShowCompareLog:
+                zhprint(' **message "' + msg + '" sended')
 
 
     # this thread check schedule and response
@@ -177,7 +181,7 @@ class ChitChat(BotPlugin):
                         and datetime.datetime.now().hour < 20 and random.randrange(0, 101) < 3 and checkDay('01234'):
                     askMsg = ['吃飯啊', '走了 吃飯啊', '有人要吃東西嗎', '吃飯吃飯吃飯吃飯吃飯', '都沒有人要跟我完', '有人在嗎？？', '幫我開門', '肚子餓了', '大家還在嗎？',
                               '怎麼這麼久都沒有人留言？', '大家好，我是googbot', '都沒人留言 大家都放假去了嗎？', '今天天氣不錯']
-                    self.mChitChat.send_from_messages(askMsg)
+                    self.mChitChat.send_from_messages(random.choice(askMsg))
 
                     global mMessageTime
                     mMessageTime = int(time.time())
@@ -208,8 +212,7 @@ class ChitChat(BotPlugin):
 
                         if random.randrange(0, 101) < int(r[key_chance]):
                             print 'roll < ' + r[key_chance] + ', success!'
-
-                            self.mChitChat.send_from_messages(r[key_msg])
+                            self.mChitChat.send_from_messages(random.choice(r[key_msg].split('*')))
 
                         else:
                             print 'roll > ' + r[key_chance] + ', failed!'
@@ -344,8 +347,7 @@ class ChitChat(BotPlugin):
                 or u"晴" in weather['weather'][0]['description'] and (int(weather['main']['temp']) - 273.15) > 30:
             rainNoti = ['記得提醒@duo大大帶傘', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘',
                         '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！']
-            self.send(mMessage.getFrom(), random.choice(
-                rainNoti), message_type=mMessage.getType())
+            self.send(mMessage.getFrom(), random.choice(           rainNoti), message_type=mMessage.getType())
 
 
     def showWeahterForcast(self):
@@ -380,8 +382,7 @@ class ChitChat(BotPlugin):
             'description'] + random.choice(
             midfixArray) + str(int(weatherToday['list'][forcastTimeZone]['main']['temp']) - 273.15) + random.choice(
             subfixArray)
-        self.send(mMessage.getFrom(), msg,
-                  message_type=mMessage.getType())
+        self.send(mMessage.getFrom(), msg,               message_type=mMessage.getType())
 
         if u"雨" in weatherToday['list'][forcastTimeZone]['weather'][0]['description'] or u"多雲" in \
                 weatherToday['list'][forcastTimeZone]['weather'][0]['description'] or u"晴" in \
@@ -389,8 +390,7 @@ class ChitChat(BotPlugin):
                     int(weatherToday['list'][forcastTimeZone]['main']['temp']) - 273.15) > 30:
             rainNoti = ['記得提醒@duo大大帶傘', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘',
                         '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！']
-            self.send(mMessage.getFrom(), random.choice(
-                rainNoti), message_type=mMessage.getType())
+            self.send(mMessage.getFrom(), random.choice(                rainNoti), message_type=mMessage.getType())
 
 
     # in order to increase chitchat variety, bot will sometimes go off the rail and do something unexpected.
@@ -696,10 +696,7 @@ class ChitChat(BotPlugin):
         if self.checkSendRandomMessage():
             return
 
-        try:
-            time.sleep(random.uniform(0, 7))
-        except:
-            print 'err when sleep'
+
 
         # do not trigger on links
         if 'http:' in message_string or 'https:' in message_string:
