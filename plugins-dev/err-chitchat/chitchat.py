@@ -672,7 +672,7 @@ class ChitChat(BotPlugin):
         if 'gogoreload' in message:
             print 'COMMDAND RECEIVED: reload action list'
             self.LastUpdateTime = 0
-            self.send = self.send(mMessage.getFrom(), 'command received, reloading', message_type=mMessage.getType())
+            self.send(mMessage.getFrom(), 'command received, reloading', message_type=mMessage.getType())
 
             return
 
