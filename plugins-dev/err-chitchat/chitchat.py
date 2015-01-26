@@ -19,12 +19,13 @@ import random
 import threading
 import time
 import datetime
-import sys
+from time import strftime
 
+import sys
 from errbot import BotPlugin, botcmd
 import requests
 from get_action import getAction
-from get_reminder import getReminder
+from get_reminder import getReminder, key_WeekOfDay, key_Hour, key_min, key_msg, key_chance
 
 
 reload(sys)
@@ -33,27 +34,115 @@ sys.setdefaultencoding("utf-8")
 MaxHistory = 40
 LastUpdateTime = 0
 
-emoji = [
-    '(allthethings)', '(android)', '(areyoukiddingme)', '(arrington)', '(arya)', '(ashton)', '(atlassian)',
-    '(awthanks)', '(awyeah)', '(badass)', '(badjokeeel)', '(badpokerface)', '(basket)', '(beer)', '(bitbucket)',
-    '(boom)', '(branch)', '(bumble)', '(bunny)', '(cadbury)', '(cake)', '(candycorn)', '(caruso)', '(ceilingcat)',
-    '(cereal)', '(cerealspit)', '(challengeaccepted)', '(chewie)', '(chocobunny)', '(chompy)', '(chris)',
-    '(chucknorris)', '(clarence)', '(coffee)', '(confluence)', '(content)', '(continue)', '(cornelius)', '(daenerys)',
-    '(dance)', '(dealwithit)', '(derp)', '(disapproval)', '(doge)', '(dosequis)', '(drevil)', '(ducreux)', '(dumb)',
-    '(embarrassed)', '(facepalm)', '(failed)', '(firstworldproblem)', '(fonzie)', '(foreveralone)', '(freddie)',
-    '(fry)', '(fuckyeah)', '(fwp)', '(gangnamstyle)', '(garret)', '(gates)', '(ghost)', '(goodnews)', '(greenbeer)',
-    '(grumpycat)', '(gtfo)', '(haveaseat)', '(heart)', '(hipchat)', '(hipster)', '(hodor)', '(huh)', '(ilied)',
-    '(indeed)', '(iseewhatyoudidthere)', '(itsatrap)', '(jackie)', '(jaime)',
-    '(jira)', '(jobs)', '(joffrey)', '(jonsnow)', '(kennypowers)', '(krang)', '(kwanzaa)', '(lincoln)', '(lol)',
-    '(lolwut)', '(megusta)', '(menorah)', '(mindblown)', '(ned)', '(nextgendev)', '(ninja)', '(notbad)',
-    '(nothingtodohere)', '(notsureif)', '(notsureifgusta)', '(obama)', '(ohcrap)', '(ohgodwhy)', '(okay)', '(omg)',
-    '(oops)', '(orly)', '(pbr)', '(pete)', '(philosoraptor)', '(pingpong)', '(pirate)', '(pokerface)', '(poo)',
-    '(present)', '(pumpkin)', '(rageguy)', '(rebeccablack)', '(reddit)', '(romney)', '(rudolph)', '(sadpanda)',
-    '(sadtroll)', '(samuel)', '(santa)', '(scumbag)', '(seamoz)', '(shamrock)', '(shrug)', '(skyrim)', '(stare)',
-    '(stash)', '(success)', '(successful)', '(sweetjesus)', '(tableflip)', '(taft)', '(tea)', '(thumbsdown)',
-    '(thumbsup)', '(tree)', '(troll)', '(truestory)', '(trump)', '(turkey)', '(twss)', '(tyrion)', '(tywin)',
-    '(unknown)', '(washington)', '(wat)', '(wtf)', '(yey)', '(yodawg)', '(yougotitdude)', '(yuno)', '(zoidberg)',
-    '(zzz)', '8)', ':#', ':$', ':(', ':)', ':-*', ':D', ':Z', ':o', ':p', ':|', ';)', ';p', '>:-(', 'O:)']
+emoji = [':bowtie:', ':smile:', ':laughing:', ':blush:', ':smiley:', ':relaxed:', ':smirk:', ':heart_eyes:', ':kissing_heart:',
+         ':kissing_closed_eyes:', ':flushed:', ':relieved:', ':satisfied:', ':grin:', ':wink:', ':stuck_out_tongue_winking_eye:',
+         ':stuck_out_tongue_closed_eyes:', ':grinning:', ':kissing:', ':kissing_smiling_eyes:', ':stuck_out_tongue:', ':sleeping:',
+         ':worried:', ':frowning:', ':anguished:', ':open_mouth:', ':grimacing:', ':confused:', ':hushed:', ':expressionless:',
+         ':unamused:', ':sweat_smile:', ':sweat:', ':disappointed_relieved:', ':weary:', ':pensive:', ':disappointed:', ':confounded:',
+         ':fearful:', ':cold_sweat:', ':persevere:', ':cry:', ':sob:', ':joy:', ':astonished:', ':scream:', ':neckbeard:',
+         ':tired_face:', ':angry:', ':rage:', ':triumph:', ':sleepy:', ':yum:', ':mask:', ':sunglasses:', ':dizzy_face:', ':imp:',
+         ':smiling_imp:', ':neutral_face:', ':no_mouth:', ':innocent:', ':alien:', ':yellow_heart:', ':blue_heart:', ':purple_heart:',
+         ':heart:', ':green_heart:', ':broken_heart:', ':heartbeat:', ':heartpulse:', ':two_hearts:', ':revolving_hearts:', ':cupid:',
+         ':sparkling_heart:', ':sparkles:', ':star:', ':star2:', ':dizzy:', ':boom:', ':collision:', ':anger:', ':exclamation:',
+         ':question:', ':grey_exclamation:', ':grey_question:', ':zzz:', ':dash:', ':sweat_drops:', ':notes:', ':musical_note:',
+         ':fire:', ':hankey:', ':poop:', ':shit:', ':+1:', ':thumbsup:', ':-1:', ':thumbsdown:', ':ok_hand:', ':punch:', ':facepunch:',
+         ':fist:', ':v:', ':wave:', ':hand:', ':raised_hand:', ':open_hands:', ':point_up:', ':point_down:', ':point_left:',
+         ':point_right:', ':raised_hands:', ':pray:', ':point_up_2:', ':clap:', ':muscle:', ':metal:', ':fu:', ':walking:', ':runner:',
+         ':running:', ':couple:', ':family:', ':two_men_holding_hands:', ':two_women_holding_hands:', ':dancer:', ':dancers:',
+         ':ok_woman:', ':no_good:', ':information_desk_person:', ':raising_hand:', ':bride_with_veil:', ':person_with_pouting_face:',
+         ':person_frowning:', ':bow:', ':couplekiss:', ':couple_with_heart:', ':massage:', ':haircut:', ':nail_care:', ':boy:',
+         ':girl:', ':woman:', ':man:', ':baby:', ':older_woman:', ':older_man:', ':person_with_blond_hair:', ':man_with_gua_pi_mao:',
+         ':man_with_turban:', ':construction_worker:', ':cop:', ':angel:', ':princess:', ':smiley_cat:', ':smile_cat:',
+         ':heart_eyes_cat:', ':kissing_cat:', ':smirk_cat:', ':scream_cat:', ':crying_cat_face:', ':joy_cat:', ':pouting_cat:',
+         ':japanese_ogre:', ':japanese_goblin:', ':see_no_evil:', ':hear_no_evil:', ':speak_no_evil:', ':guardsman:', ':skull:',
+         ':feet:', ':lips:', ':kiss:', ':droplet:', ':ear:', ':eyes:', ':nose:', ':tongue:', ':love_letter:', ':bust_in_silhouette:',
+         ':busts_in_silhouette:', ':speech_balloon:', ':thought_balloon:', ':feelsgood:', ':finnadie:', ':goberserk:', ':godmode:',
+         ':hurtrealbad:', ':rage1:', ':rage2:', ':rage3:', ':rage4:', ':suspect:', ':trollface:', ':sunny:', ':umbrella:', ':cloud:',
+         ':snowflake:', ':snowman:', ':zap:', ':cyclone:', ':foggy:', ':ocean:', ':cat:', ':dog:', ':mouse:', ':hamster:', ':rabbit:',
+         ':wolf:', ':frog:', ':tiger:', ':koala:', ':bear:', ':pig:', ':pig_nose:', ':cow:', ':boar:', ':monkey_face:', ':monkey:',
+         ':horse:', ':racehorse:', ':camel:', ':sheep:', ':elephant:', ':panda_face:', ':snake:', ':bird:', ':baby_chick:',
+         ':hatched_chick:', ':hatching_chick:', ':chicken:', ':penguin:', ':turtle:', ':bug:', ':honeybee:', ':ant:', ':beetle:',
+         ':snail:', ':octopus:', ':tropical_fish:', ':fish:', ':whale:', ':whale2:', ':dolphin:', ':cow2:', ':ram:', ':rat:',
+         ':water_buffalo:', ':tiger2:', ':rabbit2:', ':dragon:', ':goat:', ':rooster:', ':dog2:', ':pig2:', ':mouse2:', ':ox:',
+         ':dragon_face:', ':blowfish:', ':crocodile:', ':dromedary_camel:', ':leopard:', ':cat2:', ':poodle:', ':paw_prints:',
+         ':bouquet:', ':cherry_blossom:', ':tulip:', ':four_leaf_clover:', ':rose:', ':sunflower:', ':hibiscus:', ':maple_leaf:',
+         ':leaves:', ':fallen_leaf:', ':herb:', ':mushroom:', ':cactus:', ':palm_tree:', ':evergreen_tree:', ':deciduous_tree:',
+         ':chestnut:', ':seedling:', ':blossom:', ':ear_of_rice:', ':shell:', ':globe_with_meridians:', ':sun_with_face:',
+         ':full_moon_with_face:', ':new_moon_with_face:', ':new_moon:', ':waxing_crescent_moon:', ':first_quarter_moon:',
+         ':waxing_gibbous_moon:', ':full_moon:', ':waning_gibbous_moon:', ':last_quarter_moon:', ':waning_crescent_moon:',
+         ':last_quarter_moon_with_face:', ':first_quarter_moon_with_face:', ':moon:', ':earth_africa:', ':earth_americas:',
+         ':earth_asia:', ':volcano:', ':milky_way:', ':partly_sunny:', ':octocat:', ':squirrel:', ':bamboo:', ':gift_heart:',
+         ':dolls:', ':school_satchel:', ':mortar_board:', ':flags:', ':fireworks:', ':sparkler:', ':wind_chime:', ':rice_scene:',
+         ':jack_o_lantern:', ':ghost:', ':santa:', ':christmas_tree:', ':gift:', ':bell:', ':no_bell:', ':tanabata_tree:', ':tada:',
+         ':confetti_ball:', ':balloon:', ':crystal_ball:', ':cd:', ':dvd:', ':floppy_disk:', ':camera:', ':video_camera:',
+         ':movie_camera:', ':computer:', ':tv:', ':iphone:', ':phone:', ':telephone:', ':telephone_receiver:', ':pager:', ':fax:',
+         ':minidisc:', ':vhs:', ':sound:', ':speaker:', ':mute:', ':loudspeaker:', ':mega:', ':hourglass:', ':hourglass_flowing_sand:',
+         ':alarm_clock:', ':watch:', ':radio:', ':satellite:', ':loop:', ':mag:', ':mag_right:', ':unlock:', ':lock:',
+         ':lock_with_ink_pen:', ':closed_lock_with_key:', ':key:', ':bulb:', ':flashlight:', ':high_brightness:', ':low_brightness:',
+         ':electric_plug:', ':battery:', ':calling:', ':email:', ':mailbox:', ':postbox:', ':bath:', ':bathtub:', ':shower:',
+         ':toilet:', ':wrench:', ':nut_and_bolt:', ':hammer:', ':seat:', ':moneybag:', ':yen:', ':dollar:', ':pound:', ':euro:',
+         ':credit_card:', ':money_with_wings:', ':e-mail:', ':inbox_tray:', ':outbox_tray:', ':envelope:', ':incoming_envelope:',
+         ':postal_horn:', ':mailbox_closed:', ':mailbox_with_mail:', ':mailbox_with_no_mail:', ':package:', ':door:', ':smoking:',
+         ':bomb:', ':gun:', ':hocho:', ':pill:', ':syringe:', ':page_facing_up:', ':page_with_curl:', ':bookmark_tabs:', ':bar_chart:',
+         ':chart_with_upwards_trend:', ':chart_with_downwards_trend:', ':scroll:', ':clipboard:', ':calendar:', ':date:',
+         ':card_index:', ':file_folder:', ':open_file_folder:', ':scissors:', ':pushpin:', ':paperclip:', ':black_nib:', ':pencil2:',
+         ':straight_ruler:', ':triangular_ruler:', ':closed_book:', ':green_book:', ':blue_book:', ':orange_book:', ':notebook:',
+         ':notebook_with_decorative_cover:', ':ledger:', ':books:', ':bookmark:', ':name_badge:', ':microscope:', ':telescope:',
+         ':newspaper:', ':football:', ':basketball:', ':soccer:', ':baseball:', ':tennis:', ':8ball:', ':rugby_football:', ':bowling:',
+         ':golf:', ':mountain_bicyclist:', ':bicyclist:', ':horse_racing:', ':snowboarder:', ':swimmer:', ':surfer:', ':ski:',
+         ':spades:', ':hearts:', ':clubs:', ':diamonds:', ':gem:', ':ring:', ':trophy:', ':musical_score:', ':musical_keyboard:',
+         ':violin:', ':space_invader:', ':video_game:', ':black_joker:', ':flower_playing_cards:', ':game_die:', ':dart:', ':mahjong:',
+         ':clapper:', ':memo:', ':pencil:', ':book:', ':art:', ':microphone:', ':headphones:', ':trumpet:', ':saxophone:', ':guitar:',
+         ':shoe:', ':sandal:', ':high_heel:', ':lipstick:', ':boot:', ':shirt:', ':tshirt:', ':necktie:', ':womans_clothes:',
+         ':dress:', ':running_shirt_with_sash:', ':jeans:', ':kimono:', ':bikini:', ':ribbon:', ':tophat:', ':crown:', ':womans_hat:',
+         ':mans_shoe:', ':closed_umbrella:', ':briefcase:', ':handbag:', ':pouch:', ':purse:', ':eyeglasses:',
+         ':fishing_pole_and_fish:', ':coffee:', ':tea:', ':sake:', ':baby_bottle:', ':beer:', ':beers:', ':cocktail:',
+         ':tropical_drink:', ':wine_glass:', ':fork_and_knife:', ':pizza:', ':hamburger:', ':fries:', ':poultry_leg:',
+         ':meat_on_bone:', ':spaghetti:', ':curry:', ':fried_shrimp:', ':bento:', ':sushi:', ':fish_cake:', ':rice_ball:',
+         ':rice_cracker:', ':rice:', ':ramen:', ':stew:', ':oden:', ':dango:', ':egg:', ':bread:', ':doughnut:', ':custard:',
+         ':icecream:', ':ice_cream:', ':shaved_ice:', ':birthday:', ':cake:', ':cookie:', ':chocolate_bar:', ':candy:', ':lollipop:',
+         ':honey_pot:', ':apple:', ':green_apple:', ':tangerine:', ':lemon:', ':cherries:', ':grapes:', ':watermelon:', ':strawberry:',
+         ':peach:', ':melon:', ':banana:', ':pear:', ':pineapple:', ':sweet_potato:', ':eggplant:', ':tomato:', ':corn:', 'Places', '',
+         ':house:', ':house_with_garden:', ':school:', ':office:', ':post_office:', ':hospital:', ':bank:', ':convenience_store:',
+         ':love_hotel:', ':hotel:', ':wedding:', ':church:', ':department_store:', ':european_post_office:', ':city_sunrise:',
+         ':city_sunset:', ':japanese_castle:', ':european_castle:', ':tent:', ':factory:', ':tokyo_tower:', ':japan:', ':mount_fuji:',
+         ':sunrise_over_mountains:', ':sunrise:', ':stars:', ':statue_of_liberty:', ':bridge_at_night:', ':carousel_horse:',
+         ':rainbow:', ':ferris_wheel:', ':fountain:', ':roller_coaster:', ':ship:', ':speedboat:', ':boat:', ':sailboat:', ':rowboat:',
+         ':anchor:', ':rocket:', ':airplane:', ':helicopter:', ':steam_locomotive:', ':tram:', ':mountain_railway:', ':bike:',
+         ':aerial_tramway:', ':suspension_railway:', ':mountain_cableway:', ':tractor:', ':blue_car:', ':oncoming_automobile:',
+         ':car:', ':red_car:', ':taxi:', ':oncoming_taxi:', ':articulated_lorry:', ':bus:', ':oncoming_bus:', ':rotating_light:',
+         ':police_car:', ':oncoming_police_car:', ':fire_engine:', ':ambulance:', ':minibus:', ':truck:', ':train:', ':station:',
+         ':train2:', ':bullettrain_front:', ':bullettrain_side:', ':light_rail:', ':monorail:', ':railway_car:', ':trolleybus:',
+         ':ticket:', ':fuelpump:', ':vertical_traffic_light:', ':traffic_light:', ':warning:', ':construction:', ':beginner:', ':atm:',
+         ':slot_machine:', ':busstop:', ':barber:', ':hotsprings:', ':checkered_flag:', ':crossed_flags:', ':izakaya_lantern:',
+         ':moyai:', ':circus_tent:', ':performing_arts:', ':round_pushpin:', ':triangular_flag_on_post:', ':jp:', ':kr:', ':cn:',
+         ':us:', ':fr:', ':es:', ':it:', ':ru:', ':gb:', ':uk:', ':de:', ':one:', ':two:', ':three:', ':four:', ':five:', ':six:',
+         ':seven:', ':eight:', ':nine:', ':keycap_ten:', ':1234:', ':zero:', ':hash:', ':symbols:', ':arrow_backward:', ':arrow_down:',
+         ':arrow_forward:', ':arrow_left:', ':capital_abcd:', ':abcd:', ':abc:', ':arrow_lower_left:', ':arrow_lower_right:',
+         ':arrow_right:', ':arrow_up:', ':arrow_upper_left:', ':arrow_upper_right:', ':arrow_double_down:', ':arrow_double_up:',
+         ':arrow_down_small:', ':arrow_heading_down:', ':arrow_heading_up:', ':leftwards_arrow_with_hook:', ':arrow_right_hook:',
+         ':left_right_arrow:', ':arrow_up_down:', ':arrow_up_small:', ':arrows_clockwise:', ':arrows_counterclockwise:', ':rewind:',
+         ':fast_forward:', ':information_source:', ':ok:', ':twisted_rightwards_arrows:', ':repeat:', ':repeat_one:', ':new:', ':top:',
+         ':up:', ':cool:', ':free:', ':ng:', ':cinema:', ':koko:', ':signal_strength:', ':u5272:', ':u5408:', ':u55b6:', ':u6307:',
+         ':u6708:', ':u6709:', ':u6e80:', ':u7121:', ':u7533:', ':u7a7a:', ':u7981:', ':sa:', ':restroom:', ':mens:', ':womens:',
+         ':baby_symbol:', ':no_smoking:', ':parking:', ':wheelchair:', ':metro:', ':baggage_claim:', ':accept:', ':wc:',
+         ':potable_water:', ':put_litter_in_its_place:', ':secret:', ':congratulations:', ':m:', ':passport_control:',
+         ':left_luggage:', ':customs:', ':ideograph_advantage:', ':cl:', ':sos:', ':id:', ':no_entry_sign:', ':underage:',
+         ':no_mobile_phones:', ':do_not_litter:', ':non-potable_water:', ':no_bicycles:', ':no_pedestrians:', ':children_crossing:',
+         ':no_entry:', ':eight_spoked_asterisk:', ':sparkle:', ':eight_pointed_black_star:', ':heart_decoration:', ':vs:',
+         ':vibration_mode:', ':mobile_phone_off:', ':chart:', ':currency_exchange:', ':negative_squared_cross_mark:', ':a:', ':b:',
+         ':ab:', ':o2:', ':diamond_shape_with_a_dot_inside:', ':recycle:', ':end:', ':back:', ':on:', ':soon:', ':clock1:',
+         ':clock130:', ':clock10:', ':clock1030:', ':clock11:', ':clock1130:', ':clock12:', ':clock1230:', ':clock2:', ':clock230:',
+         ':clock3:', ':clock330:', ':clock4:', ':clock430:', ':clock5:', ':clock530:', ':clock6:', ':clock630:', ':clock7:',
+         ':clock730:', ':clock8:', ':clock830:', ':clock9:', ':clock930:', ':heavy_dollar_sign:', ':copyright:', ':registered:',
+         ':tm:', ':x:', ':heavy_exclamation_mark:', ':bangbang:', ':interrobang:', ':o:', ':heavy_multiplication_x:',
+         ':heavy_plus_sign:', ':heavy_minus_sign:', ':heavy_division_sign:', ':white_flower:', ':100:', ':heavy_check_mark:',
+         ':ballot_box_with_check:', ':radio_button:', ':link:', ':curly_loop:', ':wavy_dash:', ':part_alternation_mark:', ':trident:',
+         ':black_small_square:', ':white_small_square:', ':black_medium_small_square:', ':white_medium_small_square:',
+         ':black_medium_square:', ':white_medium_square:', ':black_large_square:', ':white_large_square:', ':white_check_mark:',
+         ':black_square_button:', ':white_square_button:', ':black_circle:', ':white_circle:', ':red_circle:', ':large_blue_circle:',
+         ':large_blue_diamond:', ':large_orange_diamond:', ':small_blue_diamond:', ':small_orange_diamond:', ':small_red_triangle:',
+         ':small_red_triangle_down:', ':shipit:', ':godmode:']
 
 happyString = ['爽', '好笑', '笑死']
 sadString = ['受傷', '難過', '生病', '請假', 'Q_Q', 'QQ']
@@ -62,7 +151,7 @@ angryString = ['gogobot*爛']
 mMessage = -1
 mMessageTime = 0
 
-mReminder =''
+mReminder = ''
 
 
 # time gap in sec, if you changed this value, plz change TimerThread gap 'if' constrain accordingly
@@ -74,6 +163,24 @@ def zhprint(obj):
     import re
 
     print re.sub(r"\\u([a-f0-9]{4})", lambda mg: unichr(int(mg.group(1), 16)), obj.__repr__())
+
+
+def checkTime(hour, min):
+    mHour = datetime.datetime.now().hour
+    mMinute = datetime.datetime.now().minute
+
+    if mHour >= int(hour) and mHour < int(hour) + 1 and mMinute >= int(min) and mMinute < int(min) + (timeGap / 60):
+        return True
+    else:
+        return False
+
+
+def checkDay(days_of_week):
+    day_list = list(days_of_week)
+    for d in day_list:
+        if datetime.datetime.today().weekday() == int(d):
+            return True
+    return False
 
 
 class ChitChat(BotPlugin):
@@ -103,6 +210,7 @@ class ChitChat(BotPlugin):
     ShowEmoLog = False
     ShowTalkHis = True
     ShowAntiWash = True
+    show_reminder_log = True
 
     UpdateActionInterval = 3600
     LastUpdateTime = 0
@@ -114,118 +222,89 @@ class ChitChat(BotPlugin):
 
     noteList = []
 
+    # mSelf =''
+
+    def send_from_messages(self, message_list):
+
+
+        for msg in message_list:
+
+            time.sleep(random.uniform(0, 5))
+
+            msg = msg.replace('randname', '@' + random.choice(self.histFrom).replace(' ', ''))
+            msg = msg.replace('randmsg', random.choice(self.histMsg))
+
+            self.send(mMessage.getFrom(), msg, message_type=mMessage.getType())
+
+            if self.ShowCompareLog:
+                zhprint(' **message "' + msg + '" sended')
+
 
     # this thread check schedule and response
     class TimerThread(threading.Thread):
 
         mChitChat = ''
 
-        def __init__(self, chitchat):
+        def __init__(self, chitchat_self):
             print '** checking thread started **'
             threading.Thread.__init__(self)
-            self.mChitChat = chitchat
 
-
-        def checkTime(self, hour, min):
-            mHour = datetime.datetime.now().hour+8
-            mMinute = datetime.datetime.now().minute
-            if mHour >= hour and mHour < hour + 1 and mMinute >= min and mMinute < min + (timeGap / 60):
-                return True
-            else:
-                return False
-
-        def isWorkingDay(self):
-            if datetime.datetime.today().weekday() == 6 or datetime.datetime.today().weekday() == 5:
-                return False
-            else:
-                return True
+            self.mChitChat = chitchat_self
 
 
         def run(self):
             while (True):
-                print '** check reminder **'
-
-                # eat meat reminder
-                if self.checkTime(12, 0) or self.checkTime(18, 0):
-                    print 'show eat meat reminder'
-
-                    rpyMsg = ['/me 溫馨提示 大家，可以吃肉了！！', '/me 默默的打開刀塔吃肉', '/me 表示： 親！吃肉時間已經到了，不要犧牲你的權益', '大家該吃肉了！！！','/me 表示：(turkey) 親！吃肉時間已經到了', '/me 表示：(turkey) 您有一份豪華午餐尚未領取！','大家該吃肉了！！！','(turkey) 豪華午餐已經準備好了']
-                    self.mChitChat.send('62755_gogolook_developers@conf.hipchat.com', random.choice(rpyMsg),
-                                        message_type='groupchat')
+                print '** check reminder: ', strftime("%Y-%m-%d %H:%M:%S", ), ' **'
 
                 # weather forecast
-                if ( self.checkTime(9, 10) or self.checkTime(12, 30) or self.checkTime(19, 10)) and self.isWorkingDay():
+                if ( checkTime(9, 10) or checkTime(12, 30) or checkTime(19, 10)) and \
+                        checkDay('01234') and random.randrange(0, 101) > 98:
                     print 'show weather forecast reminder'
                     self.mChitChat.showWeahterForcast()
 
                 # meetup reminder
-                if datetime.datetime.today().weekday() == 2 and (self.checkTime(14, 30) or self.checkTime(18, 0)):
-
-                    longestMsg = ''
-                    longestMsgLength = 0
-
-                    for msg in self.mChitChat.histMsg:
-                        if 'lighting' in msg or 'meetup' in msg:
-
-                            print '== following is hist has meetup info=='
-                            zhprint(msg)
-
-                            if len(msg) > longestMsgLength:
-                                longestMsgLength = len(msg)
-                                longestMsg = msg
-
-                    print '== hist end =='
-
-                    # has announced meetup topic
-                    if longestMsgLength > 20:
-                        print 'hist msg length >20, very likely to be topic announcement'
-                        zhprint(longestMsg)
-                        self.mChitChat.send('62755_gogolook_developers@conf.hipchat.com', longestMsg,
-                                            message_type='groupchat')
-
-                    # not announced yet
-                    else:
-                        print 'hist msg length <20 or not announce yet '
-
-                        askMsg = ['本週meetup輪到誰?請公佈主題 @all', '@all 請公布本週meetup題目！', '@all meetup主題到現在還沒出來？',
-                                  '@all 請教各位大大，本週meetup主題是什麼', '@all 請教各位大大，本週meetup主題是什麼呢？', '@all 本週meetup輪到誰？？？']
-                        hintMsg = ['可以用shift + enter 一次打完在送出歐', '請善用 shift + enter', '', '', '']
-
-                        self.mChitChat.send('62755_gogolook_developers@conf.hipchat.com', random.choice(askMsg),
-                                            message_type='groupchat')
-
-                        self.mChitChat.send('62755_gogolook_developers@conf.hipchat.com', random.choice(hintMsg),
-                                            message_type='groupchat')
-
-
-
-                # lunch time
-                if self.checkTime(12, 30) and random.randrange(0, 101) < 30 and self.isWorkingDay():
-                    askMsg = ['吃飯啊', '走了 吃飯啊', '吃飯吃飯', '吃飯吃飯吃飯吃飯吃飯', '有人要吃飯', '吃飯摟', '要吃飯', '誰要吃飯？ 幫我買便當', '該吃飯摟',
-                              '吃飯八', '要不要先吃飯', '有人要吃東西嗎']
-                    self.mChitChat.send('62755_gogolook_developers@conf.hipchat.com', random.choice(askMsg),
-                                        message_type='groupchat')
+                # TODO
 
                 # auto talkonButtonClickListener
-                if (int(
-                        time.time()) - mMessageTime) > 3600 * 20 and datetime.datetime.now().hour > 10 and datetime.datetime.now().hour < 20 and random.randrange(
-                        0, 101) < 3 and self.isWorkingDay():
+                if (int(time.time()) - mMessageTime) > 3600 * 20 and datetime.datetime.now().hour > 10 \
+                        and datetime.datetime.now().hour < 20 and random.randrange(0, 101) < 3 and checkDay('01234'):
                     askMsg = ['吃飯啊', '走了 吃飯啊', '有人要吃東西嗎', '吃飯吃飯吃飯吃飯吃飯', '都沒有人要跟我完', '有人在嗎？？', '幫我開門', '肚子餓了', '大家還在嗎？',
                               '怎麼這麼久都沒有人留言？', '大家好，我是googbot', '都沒人留言 大家都放假去了嗎？', '今天天氣不錯']
-                    self.mChitChat.send('62755_gogolook_developers@conf.hipchat.com', random.choice(askMsg),
-                                        message_type='groupchat')
+                    self.mChitChat.send_from_messages(random.choice(askMsg))
+
                     global mMessageTime
                     mMessageTime = int(time.time())
 
 
-                # check custom reminder
-                # todo
+                # load reminder from spreadsheet
+                reminder = getReminder()
+                for r in reminder:
+                    match_day = checkDay(r[key_WeekOfDay])
+                    match_time = checkTime(r[key_Hour], r[key_min])
 
+                    if self.mChitChat.show_reminder_log:
+                        check_status = ''
+                        if match_day:
+                            check_status += '  day matched(' + r[key_WeekOfDay] + ')   '
+                        else:
+                            check_status += '  day not matched(' + r[key_WeekOfDay] + ')   '
 
+                        if match_time:
+                            check_status += 'time matched(' + r[key_Hour] + ':' + r[key_min] + ')'
+                        else:
+                            check_status += 'time not matched(' + r[key_Hour] + ':' + r[key_min] + ')'
 
+                        zhprint('reminder check: ' + r[key_msg][0] + check_status)
 
+                    if match_day and match_time:
+                        print '**time matched**'
 
+                        if random.randrange(0, 101) < int(r[key_chance]):
+                            print 'roll < ' + r[key_chance] + ', success!'
+                            self.mChitChat.send_from_messages(random.choice(r[key_msg].split('*')))
 
+                        else:
+                            print 'roll > ' + r[key_chance] + ', failed!'
 
 
                 # setting status is not working on gogobot??
@@ -300,6 +379,7 @@ class ChitChat(BotPlugin):
 
             print '**** end of hist ****'
 
+
     def getgirls(self, message):
         a = json.loads(
             requests.get('http://curator.im/api/stream/?token=3b57cbb863364e9eb2f4cd7f833df331&page=' + str(
@@ -310,6 +390,7 @@ class ChitChat(BotPlugin):
 
         return a['results'][index]['image']
 
+
     # check if previous talk contain keyword
     def prevContain(self, keywordArray):
         for key in keywordArray:
@@ -317,6 +398,7 @@ class ChitChat(BotPlugin):
                 if key in prevMsg:
                     return True
         return False
+
 
     def checkWeather(self, message_string):
         if random.randrange(0, 11) < 2:
@@ -336,6 +418,7 @@ class ChitChat(BotPlugin):
                 return True
             return False
 
+
     def showWeahterNow(self):
         weather = json.loads(
             requests.get('http://api.openweathermap.org/data/2.5/weather?q=taipei&lang=zh_tw').content)
@@ -343,7 +426,7 @@ class ChitChat(BotPlugin):
         prefixArray = ['感謝@Duo大大，現在的天氣是', 'hihi~  現在的天氣是', '現在外面天氣是', '外面天氣', '現在外面天氣是', '外面天氣'
                                                                                          '因為' + random.choice(
             self.histFrom) + '的關係，現在的天氣是']
-        midfixArray = [' 氣溫是', ',溫度有', '，結果氣溫']
+        midfixArray = [' 氣溫是', ',溫度有', '，結果氣溫', '，然後氣溫是']
         subfixArray = [
             '度', '度', '度', '度，真的不是人在待的', '度, 可去外面曬曬太陽', '度, 意圖令人開冷氣', '度, 我都快熱當了!!', '有夠冷', '令人打了個韓戰', '記得多加件外套',
             '度，外出多加注意歐', '度，不要忘了防曬歐', '度，真是冷死人了', '度，不是很適合出門', '，真想待在家裡不出門....', '', '', '']
@@ -352,15 +435,14 @@ class ChitChat(BotPlugin):
         self.send(mMessage.getFrom(), msg,
                   message_type=mMessage.getType())
 
-        if u"雨" in weather['weather'][0]['description'] or u"多雲" in weather['weather'][0]['description'] or u"晴" in \
-                weather['weather'][0]['description'] and (int(weather['main']['temp']) - 273.15) > 30:
+        if u"雨" in weather['weather'][0]['description'] or u"多雲" in weather['weather'][0]['description'] \
+                or u"晴" in weather['weather'][0]['description'] and (int(weather['main']['temp']) - 273.15) > 30:
             rainNoti = ['記得提醒@duo大大帶傘', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘',
                         '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！']
-            self.send(mMessage.getFrom(), random.choice(
-                rainNoti), message_type=mMessage.getType())
+            self.send(mMessage.getFrom(), random.choice(rainNoti), message_type=mMessage.getType())
+
 
     def showWeahterForcast(self):
-
         weatherToday = json.loads(
             requests.get('http://api.openweathermap.org/data/2.5/forecast?q=taipei&lang=zh_tw').content)
 
@@ -392,8 +474,7 @@ class ChitChat(BotPlugin):
             'description'] + random.choice(
             midfixArray) + str(int(weatherToday['list'][forcastTimeZone]['main']['temp']) - 273.15) + random.choice(
             subfixArray)
-        self.send(mMessage.getFrom(), msg,
-                  message_type=mMessage.getType())
+        self.send(mMessage.getFrom(), msg, message_type=mMessage.getType())
 
         if u"雨" in weatherToday['list'][forcastTimeZone]['weather'][0]['description'] or u"多雲" in \
                 weatherToday['list'][forcastTimeZone]['weather'][0]['description'] or u"晴" in \
@@ -401,8 +482,8 @@ class ChitChat(BotPlugin):
                     int(weatherToday['list'][forcastTimeZone]['main']['temp']) - 273.15) > 30:
             rainNoti = ['記得提醒@duo大大帶傘', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘',
                         '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！', '出門記得帶把傘', '記得要帶傘出門歐！']
-            self.send(mMessage.getFrom(), random.choice(
-                rainNoti), message_type=mMessage.getType())
+            self.send(mMessage.getFrom(), random.choice(rainNoti), message_type=mMessage.getType())
+
 
     # in order to increase chitchat variety, bot will sometimes go off the rail and do something unexpected.
     # sendRandomMessage() insure bot will reply something meaningless occasionally.
@@ -410,7 +491,7 @@ class ChitChat(BotPlugin):
         if random.randrange(0, 101) > 98:
             print ' **send random message'
 
-            if random.randrange(0, 101) < 65:
+            if random.randrange(0, 101) < 75:
 
                 action = random.choice(self.action_list)
                 while 'commonDia' in action and action['commonDia'] == False:
@@ -428,34 +509,33 @@ class ChitChat(BotPlugin):
 
             else:
                 if random.randrange(0, 101) > 50:
-                    radReply = ['http://i.imgur.com/DJG1aF4.jpg', 'http://i.imgur.com/ggvWFBo.jpg',
-                                'http://i.imgur.com/xovuE25.jpg'
-                                'http://i.imgur.com/uSGbEFG.jpg', 'http://i.imgur.com/mAuzhW9.jpg',
-                                'http://i.imgur.com/8J0DPac.jpg',
-
+                    radReply = ['http://i.imgur.com/DJG1aF4.jpg', 'http://i.imgur.com/ggvWFBo.jpg', 'http://i.imgur.com/xovuE25.jpg',
+                                'http://i.imgur.com/uSGbEFG.jpg', 'http://i.imgur.com/mAuzhW9.jpg', 'http://i.imgur.com/8J0DPac.jpg',
+                                random.choice(self.histMsg), random.choice(self.histMsg), random.choice(self.histMsg),
                                 random.choice(self.histMsg), random.choice(self.histMsg), random.choice(self.histMsg),
                                 random.choice(self.histMsg), random.choice(self.histMsg), random.choice(self.histMsg)]
 
                     response_messages = random.choice(radReply).split('*')
 
                     for msg in response_messages:
-                        self.send(mMessage.getFrom(),
-                                  msg,
-                                  message_type=mMessage.getType())
+                        self.send(mMessage.getFrom(), msg, message_type=mMessage.getType())
                         print' **random message "', msg, '" sended'
 
                 else:
                     msg = random.choice(emoji)
-                    self.send(mMessage.getFrom(),
-                              msg,
-                              message_type=mMessage.getType())
+                    self.send(mMessage.getFrom(), msg, message_type=mMessage.getType())
                     print' **random message "', msg, '" sended'
 
             return True
 
         return False
 
+
     def antiWash(self):
+        return False
+
+        # remove antiwash function
+
         if len(self.histFrom) - self.histPisiton < 7:
             return False
 
@@ -463,18 +543,18 @@ class ChitChat(BotPlugin):
         firstPesron = self.histFrom[self.histPisiton]
 
         i = self.histPisiton
-        while i < len(self.histFrom) and i < self.histPisiton + 7:
+        while i > 0 and i > self.histPisiton - 7:
             if firstPesron != self.histFrom[i]:
+                print 'name', self.histFrom[i]
                 samePerson = False
+                i -= 1
                 break
-            i = i + 1
 
         if samePerson:
             if random.randrange(0, 101) > 75:
                 self.angry += 3
                 response = ['可以不要洗版了嗎？', '洗版很好玩嗎？', '不要為了要我回文亂發言好嗎？', '人的忍耐是有限度的！']
-                self.send(mMessage.getFrom(), random.choice(
-                    response), message_type=mMessage.getType())
+                self.send(mMessage.getFrom(), random.choice(response), message_type=mMessage.getType())
             else:
                 if random.randrange(0, 101) > 80:
                     self.angry += 2
@@ -482,16 +562,18 @@ class ChitChat(BotPlugin):
                     i = 0
                     for msg in self.histMsg:
                         self.send(mMessage.getFrom(), random.choice(self.histMsg), message_type=mMessage.getType())
-                        i = i + 1
+                        i += 1
                         if i > 7:
                             return True
 
         return samePerson
 
+
     def printCurrentEmotion(self):
         print '*** print emo ***'
         print 'happy: ', self.happy, 'sad: ', self.sad, 'angry level: ', self.angry
         print'*** lastCheckTime: ', self.lastCheckTime, ' ***'
+
 
     def checkIfContain(self, keyArray, message_string):
         # total key array
@@ -526,9 +608,9 @@ class ChitChat(BotPlugin):
                 return True
         return False
 
+
     # check if people speak in bad temper,
     def checkBadPeople(self, message_string):
-
         badEnding = [u'拉', u'啦', u'辣']
         response = ['兇屁', '你是在大聲什麼啦！', '你生氣了？？']
 
@@ -538,14 +620,13 @@ class ChitChat(BotPlugin):
 
                 self.angry += 1
                 if random.randrange(0, 101) > 50:
-                    self.send(mMessage.getFrom(), random.choice(
-                        response), message_type=mMessage.getType())
-                    self.hatedPeopleName = mMessage.message.getFrom(
-                    ).getResource()
+                    self.send(mMessage.getFrom(), random.choice(response), message_type=mMessage.getType())
+                    self.hatedPeopleName = mMessage.message.getFrom().getResource()
                     return True
                 else:
                     return False
         return False
+
 
     def updateCurrentEmotion(self, message_string):
         # decay emotion with the time passed
@@ -585,14 +666,13 @@ class ChitChat(BotPlugin):
                 print 'angry str matched: ' + message_string
             self.angry += 1
 
-    def checkGogobotCmd(self, message):
 
+    def checkGogobotCmd(self, message):
         # reload all action list
         if 'gogoreload' in message:
             print 'COMMDAND RECEIVED: reload action list'
             self.LastUpdateTime = 0
-            self.send = self.send(mMessage.getFrom(), 'command received, reloading',
-                                  message_type=mMessage.getType())
+            self.send = self.send(mMessage.getFrom(), 'command received, reloading', message_type=mMessage.getType())
 
             return
 
@@ -600,8 +680,7 @@ class ChitChat(BotPlugin):
             print 'COMMDAND RECEIVED: reset memory'
             self.histFrom = []
             self.histMsg = []
-            self.send(mMessage.getFrom(), 'command received, history is now clean',
-                      message_type=mMessage.getType())
+            self.send(mMessage.getFrom(), 'command received, history is now clean', message_type=mMessage.getType())
 
         if 'gogoshowcompare' in message:
             if self.ShowCompareLog == True:
@@ -618,8 +697,7 @@ class ChitChat(BotPlugin):
             print 'COMMDAND RECEIVED: ShowTalkHis set to ', self.ShowCompareLog
 
         if 'gogotest' in message:
-            self.send(mMessage.getFrom(), '@NickJian',
-                      message_type=mMessage.getType())
+            self.send(mMessage.getFrom(), '@NickJian', message_type=mMessage.getType())
             print 'COMMDAND RECEIVED: gogotest'
 
         if 'gogowash' in message:
@@ -628,9 +706,17 @@ class ChitChat(BotPlugin):
             else:
                 self.ShowAntiWash = True
 
-            self.send(mMessage.getFrom(), 'antiwash status is now :' + self.ShowAntiWash,
-                      message_type=mMessage.getType())
+            self.send(mMessage.getFrom(), 'antiwash status is now :' + self.ShowAntiWash, message_type=mMessage.getType())
             print 'COMMDAND RECEIVED: antiwash status is now :', self.ShowAntiWash
+
+        if 'gogoremindlog' in message:
+
+            if self.show_reminder_log:
+                self.show_reminder_log = False
+            else:
+                self.show_reminder_log = True
+            self.send(mMessage.getFrom(), 'gogoremindlog status is now :' + self.ShowAntiWash,
+                      message_type=mMessage.getType())
 
 
     @botcmd
@@ -662,11 +748,15 @@ class ChitChat(BotPlugin):
 
         # ###### pre-process #######
 
+
         message_string = message.getBody().lower()
         message_from = message.getFrom().getResource()
 
         if not message_from or not message_string:
+            print 'error ', message_from
+            print 'error ', message_string
             return
+
         if message_from == 'Gogo Bot':
             return
 
@@ -675,11 +765,6 @@ class ChitChat(BotPlugin):
         global mMessageTime
         mMessageTime = int(time.time())
 
-        # start checking thread if snot started yet
-        if self.isCheckThreadStarted == False:
-            mThread = self.TimerThread(self)
-            mThread.start()
-            self.isCheckThreadStarted = True
 
 
         # non-gogobot response part, maybe custom gogobot command or some bug proof code.
@@ -687,6 +772,13 @@ class ChitChat(BotPlugin):
         self.checkUpdateKeyword()
 
         self.saveHist(message_string, message_from)
+
+
+        # start checking thread if snot started yet
+        if not self.isCheckThreadStarted:
+            mThread = self.TimerThread(self)
+            mThread.start()
+            self.isCheckThreadStarted = True
 
         # ###### gogobot response part #######
 
@@ -697,6 +789,8 @@ class ChitChat(BotPlugin):
         # random response #1
         if self.checkSendRandomMessage():
             return
+
+
 
         # do not trigger on links
         if 'http:' in message_string or 'https:' in message_string:
@@ -737,10 +831,10 @@ class ChitChat(BotPlugin):
         for action in self.action_list:
             if self.ShowCompareLog:
                 if counter < 10:
-                    counter = counter + 1
+                    counter += 1
                     Appendedkeyword = Appendedkeyword + action['keyword'][0] + ", "
                 else:
-                    print 'chcecking keyword type: ', Appendedkeyword
+                    print 'check keywords: ', Appendedkeyword
                     counter = 0
                     Appendedkeyword = ' '
 
@@ -757,21 +851,8 @@ class ChitChat(BotPlugin):
                         totalMessage = random.choice(action['response'])
                         response_messages = totalMessage.split('*')
 
-                        for msg in response_messages:
+                        self.send_from_messages(response_messages)
 
-
-                            msg = msg.replace('randname', '@' + random.choice(self.histFrom).replace(' ', ''))
-                            msg = msg.replace('randmsg', random.choice(self.histMsg))
-
-                            self.send(message.getFrom(),
-                                      msg,
-                                      message_type=message.getType())
-
-                            print 'msg type: ', message.getType()
-                            print 'msg from: ', message.getFrom()
-
-                            if self.ShowCompareLog:
-                                zhprint(' **message "' + msg + '" sended')
                         return
                     elif self.ShowCompareLog:
                         print ' **rand > ', action['chance'], ', roll failed!'
@@ -780,17 +861,7 @@ class ChitChat(BotPlugin):
                     totalMessage = random.choice(action['response'])
                     response_messages = totalMessage.split('*')
 
-                    for msg in response_messages:
-
-                        msg = msg.replace('randname', '@' + random.choice(self.histFrom).replace(' ', ''))
-                        msg = msg.replace('randmsg', random.choice(self.histMsg))
-
-                        self.send(message.getFrom(),
-                                  msg,
-                                  message_type=message.getType())
-                        if self.ShowCompareLog:
-                            zhprint('message "' + msg + '" sended')
-
+                    self.send_from_messages(response_messages)
                     return
 
 
@@ -799,7 +870,7 @@ class ChitChat(BotPlugin):
             return
 
         if self.ShowCompareLog and counter != 0:
-            print 'chcecking keyword type: ', Appendedkeyword
+            print 'chceck keyword: ', Appendedkeyword
 
         print '****** end checking action *****'
 
