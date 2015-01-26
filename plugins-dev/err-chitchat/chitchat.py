@@ -696,6 +696,11 @@ class ChitChat(BotPlugin):
         if self.checkSendRandomMessage():
             return
 
+        try:
+            time.sleep(random.uniform(0, 7))
+        except:
+            print 'err when sleep'
+
         # do not trigger on links
         if 'http:' in message_string or 'https:' in message_string:
             self.checkSendRandomMessage()
