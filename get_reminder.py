@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import datetime
+import random
+from time import strftime
+
 import gspread
 
 
@@ -11,7 +15,8 @@ key_WeekOfDay = 'weekofday'
 key_Hour = 'hour'
 key_min = 'min'
 key_msg = 'msg'
-key_workonly = 'workonly'
+key_chance = 'chance'
+
 
 
 def zhprint(obj):
@@ -20,8 +25,8 @@ def zhprint(obj):
     print re.sub(r"\\u([a-f0-9]{4})", lambda mg: unichr(int(mg.group(1), 16)), obj.__repr__())
 
 
-def refreshData(dataList):
-    gc = gspread.login('gogobot5566', 'whoscall123')
+def load_data(dataList):
+    gc = gspread.login('gogobot5566', 'ilovegogobot')
 
     wks = gc.open('gogobotReminder').get_worksheet(1)
     rowCount = wks.row_count
@@ -31,20 +36,18 @@ def refreshData(dataList):
     try:
         for r in range(1, rowCount):
 
-            print '*** getting row:', r, ' ***'
+            print '***** getting row:', r, ' *****'
 
             newData = {}
             newData[key_WeekOfDay] = data[r][initColumn]
             newData[key_Hour] = data[r][initColumn + 1]
             newData[key_min] = data[r][initColumn + 2]
+            newData[key_chance] = data[r][initColumn + 3]
 
             newData[key_msg] = []
-            newData[key_msg].append(data[r][initColumn + 3])
-
-            if 'TRUE' in data[r][initColumn + 4]:
-                newData[key_workonly] = True
-            else:
-                newData[key_workonly] = False
+            tempArray = data[r][initColumn + 4].splitlines()
+            for res in tempArray:
+                newData[key_msg].append(res)
 
             zhprint(newData)
 
@@ -56,16 +59,16 @@ def refreshData(dataList):
                 print '!!! invalid data, dropped !!!'
 
     except:
-        print 'end of rows'
+        print '***** end of rows *****'
+
+
 
 
 def getReminder():
     dataList = []
 
-    refreshData(dataList)
+    load_data(dataList)
 
     return dataList
-
-
 
 
