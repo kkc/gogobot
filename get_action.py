@@ -6,7 +6,7 @@ import gspread
 
 ColumnCount = 5
 show_import_star_log = False
-show_log =False
+show_log = False
 
 
 def zhprint(obj):
@@ -25,7 +25,7 @@ def getStarCount(list):
             max_star = text.count('*')
         total_star_count += text.count('*')
         keyword_count += 1
-    return int(round((max_star + total_star_count) * 30 / keyword_count) + keyword_count)
+    return int(round((max_star + total_star_count) * 30 / keyword_count) + keyword_count) + random.randrange(0, 60)
 
 
 def refreshData(dataList, initColumn):

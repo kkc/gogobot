@@ -275,34 +275,34 @@ class ChitChat(BotPlugin):
 
 
                 # load reminder from spreadsheet
-                # reminder = getReminder()
-                # for r in reminder:
-                #     match_day = checkDay(r[key_WeekOfDay])
-                #     match_time = checkTime(r[key_Hour], r[key_min])
+                reminder = getReminder()
+                for r in reminder:
+                    match_day = checkDay(r[key_WeekOfDay])
+                    match_time = checkTime(r[key_Hour], r[key_min])
 
-                #     if self.mChitChat.show_reminder_log:
-                #         check_status = ''
-                #         if match_day:
-                #             check_status += '  day matched(' + r[key_WeekOfDay] + ')   '
-                #         else:
-                #             check_status += '  day not matched(' + r[key_WeekOfDay] + ')   '
+                    if self.mChitChat.show_reminder_log:
+                        check_status = ''
+                        if match_day:
+                            check_status += '  day matched(' + r[key_WeekOfDay] + ')   '
+                        else:
+                            check_status += '  day not matched(' + r[key_WeekOfDay] + ')   '
 
-                #         if match_time:
-                #             check_status += 'time matched(' + r[key_Hour] + ':' + r[key_min] + ')'
-                #         else:
-                #             check_status += 'time not matched(' + r[key_Hour] + ':' + r[key_min] + ')'
+                        if match_time:
+                            check_status += 'time matched(' + r[key_Hour] + ':' + r[key_min] + ')'
+                        else:
+                            check_status += 'time not matched(' + r[key_Hour] + ':' + r[key_min] + ')'
 
-                #         zhprint('reminder check: ' + r[key_msg][0] + check_status)
+                        zhprint('reminder check: ' + r[key_msg][0] + check_status)
 
-                #     if match_day and match_time:
-                #         print '**time matched**'
+                    if match_day and match_time:
+                        print '**time matched**'
 
-                #         if random.randrange(0, 101) < int(r[key_chance]):
-                #             print 'roll < ' + r[key_chance] + ', success!'
-                #             self.mChitChat.send_from_messages(random.choice(r[key_msg].split('*')))
+                        if random.randrange(0, 101) < int(r[key_chance]):
+                            print 'roll < ' + r[key_chance] + ', success!'
+                            self.mChitChat.send_from_messages(random.choice(r[key_msg].split('*')))
 
-                #         else:
-                #             print 'roll > ' + r[key_chance] + ', failed!'
+                        else:
+                            print 'roll > ' + r[key_chance] + ', failed!'
 
 
                 # setting status is not working on gogobot??
