@@ -68,7 +68,7 @@ def getReminder():
     dataList = []
 
     load_data(dataList)
-    print 'total reminder count:',dataList.count()
+    print 'total reminder count:', len(dataList)
 
     return dataList
 

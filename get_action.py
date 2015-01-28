@@ -1,12 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import random
+
 import gspread
+import sys
 
 
 ColumnCount = 5
 show_import_star_log = False
-show_log = False
+show_log = True
 
 
 def zhprint(obj):
@@ -25,7 +28,7 @@ def getStarCount(list):
             max_star = text.count('*')
         total_star_count += text.count('*')
         keyword_count += 1
-    return int(round((max_star + total_star_count) * 30 / keyword_count) + keyword_count) + random.randrange(0, 60)
+    return int(round((max_star + total_star_count) * 30 / keyword_count) + keyword_count) + random.randrange(0, 50)
 
 
 def refreshData(dataList, initColumn):
@@ -99,8 +102,9 @@ def refreshData(dataList, initColumn):
 
     except IndexError:
         print '*** end of lines ***'
-    except:
-        print 'Unexpected error:'
+    except Exception, err:
+
+        print sys.exc_info()[0]
 
 
 def getAction():
