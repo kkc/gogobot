@@ -1,10 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import datetime
-import random
-from time import strftime
-
 import gspread
 
 
@@ -17,6 +13,7 @@ key_min = 'min'
 key_msg = 'msg'
 key_chance = 'chance'
 
+show_parse_log = True
 
 
 def zhprint(obj):
@@ -31,7 +28,9 @@ def load_data(dataList):
     wks = gc.open('gogobotReminder').get_worksheet(1)
     rowCount = wks.row_count
 
-    print 'start loading reminder from spreadSheet ...'
+    if show_parse_log:
+        print 'start loading reminder from spreadSheet ...'
+
     data = wks.get_all_values()
     try:
         for r in range(1, rowCount):
@@ -54,20 +53,22 @@ def load_data(dataList):
             if len(newData[key_WeekOfDay]) > 0 and len(newData[key_Hour]) > 0 and len(newData[key_min]) > 0 and len(
                     newData[key_msg]) > 0 and len(newData[key_WeekOfDay]) > 0:
                 dataList.append(newData)
-                print 'data received'
+                if show_parse_log:
+                    print 'data received'
             else:
-                print '!!! invalid data, dropped !!!'
+                if show_parse_log:
+                    print '!!! invalid data, dropped !!!'
 
     except:
-        print '***** end of rows *****'
-
-
+        if show_parse_log:
+            print '***** end of rows *****'
 
 
 def getReminder():
     dataList = []
 
     load_data(dataList)
+    print 'total reminder count:',dataList.count()
 
     return dataList
 
