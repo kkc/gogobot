@@ -102,7 +102,9 @@ BOT_ADMINS = ('gogobot@gogolook.xmpp.slack.com','gogolook.irDP3gA9R4lR1k4FEjVX')
 # using the format (RoomName, Password).
 CHATROOM_PRESENCE = [(u'general@conference.gogolook.xmpp.slack.com'),
                      (u'gogobot-dev@conference.gogolook.xmpp.slack.com'),
-                     (u'gogobot-pochi@conference.gogolook.xmpp.slack.com')]
+                     (u'gogobot-pochi@conference.gogolook.xmpp.slack.com'),
+                     (u'server@conference.gogolook.xmpp.slack.com'),
+                     (u'random@conference.gogolook.xmpp.slack.com')]
 
 # The FullName, or nickname, your bot should use. What you set here will
 # be the nickname that Err shows in chatrooms. Note that some XMPP
