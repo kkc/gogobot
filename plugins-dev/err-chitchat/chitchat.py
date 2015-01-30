@@ -234,7 +234,15 @@ class ChitChat(BotPlugin):
     def send_from_messages(self, message_list):
         for msg in message_list:
 
-            time.sleep(random.uniform(0, 5))
+            msg_len = len(msg)
+            if msg_len < 5:
+                msg_len = 5
+
+            sleep_time = random.uniform(0, 0.3) * msg_len
+            if sleep_time > 9:
+                sleep_time = 7 + random.uniform(0, 2)
+
+            time.sleep(sleep_time)
 
             msg = msg.replace('randname', '@' + random.choice(self.histFrom).replace(' ', ''))
             msg = msg.replace('randmsg', random.choice(self.histMsg))
@@ -249,26 +257,27 @@ class ChitChat(BotPlugin):
                 global speaker
 
                 # detect language
-                detected_string = re.findall(ur'[\u1100-\u11ff]+', msg)
-                detected_string2 = re.findall(ur'[\uac00-\ud7af]+', msg)
-                if len(detected_string) > 0 or len(detected_string2) > 0:
-                    call(["say", "-v", 'yuna', msg])
-                    print 'speak as korean'
-                    return
-
-                detected_string = re.findall(ur'[\u3040-\u30ff]+', msg)
-
-                if len(detected_string) > 0:
-                    call(["say", "-v", 'kyoto', msg])
-                    print 'speak as japanese'
-                    return
+                detected_string_kr1 = re.findall(ur'[\u1100-\u11ff]+', msg)
+                detected_string_kr2 = re.findall(ur'[\uac00-\ud7af]+', msg)
+                detected_string_jp = re.findall(ur'[\u3040-\u30ff]+', msg)
 
                 if len(speaker) > 0:
                     call(["say", "-v", speaker, msg])
-                    print 'speak as custom speaker'
+                    print 'speak as custom speaker: ',speaker
+                    # reset speaker
                     speaker = ''
+
+                elif len(detected_string_jp) > 0:
+                    call(["say", "-v", 'kyoko', msg])
+                    print 'speak as japanese'
+
+                elif len(detected_string_kr1) > 0 or len(detected_string_kr2) > 0:
+                    call(["say", "-v", 'yuna', msg])
+                    print 'speak as korean'
+
                 else:
                     call(["say", msg])
+                    print 'speak as default speaker'
 
 
     # this thread check schedule and response
@@ -303,8 +312,8 @@ class ChitChat(BotPlugin):
                 # '怎麼這麼久都沒有人留言？', '大家好，我是googbot', '都沒人留言 大家都放假去了嗎？', '今天天氣不錯']
                 # self.mChitChat.send_from_messages(random.choice(askMsg))
 
-                #     global mMessageTime
-                #     mMessageTime = int(time.time())
+                # global mMessageTime
+                # mMessageTime = int(time.time())
 
 
                 # load reminder from spreadsheet
@@ -572,8 +581,8 @@ class ChitChat(BotPlugin):
                     self.send_from_messages([response_messages])
 
                 else:
-                    msg = random.choice([emoji])
-                    self.send_from_messages(msg)
+                    msg = random.choice(emoji)
+                    self.send_from_messages([msg])
                     print' **random message "', msg, '" sended'
 
             return True

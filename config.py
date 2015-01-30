@@ -105,6 +105,7 @@ CHATROOM_PRESENCE = [(u'general@conference.gogolook.xmpp.slack.com'),
                      (u'gogobot-pochi@conference.gogolook.xmpp.slack.com'),
                      (u'gogobot_secret_lab@conference.gogolook.xmpp.slack.com'),
                      (u'server@conference.gogolook.xmpp.slack.com'),
+                     (u'marketing@conference.gogolook.xmpp.slack.com'),
                      (u'random@conference.gogolook.xmpp.slack.com')]
 
 
