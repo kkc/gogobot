@@ -1,6 +1,6 @@
-##########################################################################
-#                                                                        #
-#  This is the config-template for Err. This file should be copied and   #
+# #########################################################################
+# #
+# This is the config-template for Err. This file should be copied and   #
 #  renamed to config.py, then modified as you see fit to run Err the way #
 #  you like it.                                                          #
 #                                                                        #
@@ -65,7 +65,7 @@ BOT_ASYNC = True
 BOT_IDENTITY = {
     # XMPP (Jabber) mode
     u'username': u'gogobot@gogolook.xmpp.slack.com',  # The JID of the user you have created for the bot
-    u'password': u'gogolook.irDP3gA9R4lR1k4FEjVX',       # The corresponding password for this user
+    u'password': u'gogolook.irDP3gA9R4lR1k4FEjVX',  # The corresponding password for this user
 
     ## HipChat mode (Comment the above if using this mode)
     # 'username' : u'62755_595125@chat.hipchat.com',
@@ -94,7 +94,7 @@ BOT_IDENTITY = {
 # Note: With campfire this should be the full name of a person, like so:
 # BOT_ADMINS = ('Guillaume Binet',)
 #
-BOT_ADMINS = ('gogobot@gogolook.xmpp.slack.com','gogolook.irDP3gA9R4lR1k4FEjVX')
+BOT_ADMINS = ('gogobot@gogolook.xmpp.slack.com', 'gogolook.irDP3gA9R4lR1k4FEjVX')
 
 # Chatrooms your bot should join on startup. For the IRC backend you
 # should include the # sign here. For XMPP rooms that are password
@@ -102,7 +102,11 @@ BOT_ADMINS = ('gogobot@gogolook.xmpp.slack.com','gogolook.irDP3gA9R4lR1k4FEjVX')
 # using the format (RoomName, Password).
 CHATROOM_PRESENCE = [(u'general@conference.gogolook.xmpp.slack.com'),
                      (u'gogobot-dev@conference.gogolook.xmpp.slack.com'),
-                     (u'gogobot-pochi@conference.gogolook.xmpp.slack.com')]
+                     (u'gogobot-pochi@conference.gogolook.xmpp.slack.com'),
+                     (u'gogobot_secret_lab@conference.gogolook.xmpp.slack.com'),
+                     (u'server@conference.gogolook.xmpp.slack.com'),
+                     (u'random@conference.gogolook.xmpp.slack.com')]
+
 
 # The FullName, or nickname, your bot should use. What you set here will
 # be the nickname that Err shows in chatrooms. Note that some XMPP
@@ -215,7 +219,7 @@ REVERSE_CHATROOM_RELAY = {}
 # change this depending on your environment. Setting this to None disables
 # certificate validation, which can be useful if you have a self-signed
 # certificate for example.
-XMPP_CA_CERT_FILE = None # "/etc/ssl/certs/ca-certificates.crt"
+XMPP_CA_CERT_FILE = None  # "/etc/ssl/certs/ca-certificates.crt"
 
 # Influence the security methods used on connection with XMPP-based
 # backends. You can use this to work around authentication issues with

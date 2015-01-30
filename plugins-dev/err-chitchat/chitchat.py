@@ -20,7 +20,9 @@ import threading
 import time
 import datetime
 from time import strftime
+from subprocess import call
 
+import re
 import sys
 from errbot import BotPlugin, botcmd
 import requests
@@ -153,6 +155,11 @@ mMessageTime = 0
 
 mReminder = ''
 
+speaker = ''
+speak_out = True
+
+
+
 
 # time gap in sec, if you changed this value, plz change TimerThread gap 'if' constrain accordingly
 # default value: 300
@@ -237,6 +244,32 @@ class ChitChat(BotPlugin):
             if self.ShowCompareLog:
                 zhprint(' **message "' + msg + '" sended')
 
+            if speak_out and not msg.startswith('http'):
+
+                global speaker
+
+                # detect language
+                detected_string = re.findall(ur'[\u1100-\u11ff]+', msg)
+                detected_string2 = re.findall(ur'[\uac00-\ud7af]+', msg)
+                if len(detected_string) > 0 or len(detected_string2) > 0:
+                    call(["say", "-v", 'yuna', msg])
+                    print 'speak as korean'
+                    return
+
+                detected_string = re.findall(ur'[\u3040-\u30ff]+', msg)
+
+                if len(detected_string) > 0:
+                    call(["say", "-v", 'kyoto', msg])
+                    print 'speak as japanese'
+                    return
+
+                if len(speaker) > 0:
+                    call(["say", "-v", speaker, msg])
+                    print 'speak as custom speaker'
+                    speaker = ''
+                else:
+                    call(["say", msg])
+
 
     # this thread check schedule and response
     class TimerThread(threading.Thread):
@@ -265,10 +298,10 @@ class ChitChat(BotPlugin):
 
                 # auto talkonButtonClickListener
                 # if (int(time.time()) - mMessageTime) > 3600 * 20 and datetime.datetime.now().hour > 10 \
-                #         and datetime.datetime.now().hour < 20 and random.randrange(0, 101) < 3 and checkDay('01234'):
-                #     askMsg = ['吃飯啊', '走了 吃飯啊', '有人要吃東西嗎', '吃飯吃飯吃飯吃飯吃飯', '都沒有人要跟我完', '有人在嗎？？', '幫我開門', '肚子餓了', '大家還在嗎？',
-                #               '怎麼這麼久都沒有人留言？', '大家好，我是googbot', '都沒人留言 大家都放假去了嗎？', '今天天氣不錯']
-                #     self.mChitChat.send_from_messages(random.choice(askMsg))
+                # and datetime.datetime.now().hour < 20 and random.randrange(0, 101) < 3 and checkDay('01234'):
+                # askMsg = ['吃飯啊', '走了 吃飯啊', '有人要吃東西嗎', '吃飯吃飯吃飯吃飯吃飯', '都沒有人要跟我完', '有人在嗎？？', '幫我開門', '肚子餓了', '大家還在嗎？',
+                # '怎麼這麼久都沒有人留言？', '大家好，我是googbot', '都沒人留言 大家都放假去了嗎？', '今天天氣不錯']
+                # self.mChitChat.send_from_messages(random.choice(askMsg))
 
                 #     global mMessageTime
                 #     mMessageTime = int(time.time())
@@ -481,6 +514,31 @@ class ChitChat(BotPlugin):
             self.send(mMessage.getFrom(), random.choice(rainNoti), message_type=mMessage.getType())
 
 
+    # change status of speak function
+    def check_modify_speak_status(self, msg):
+
+        if not 'gogobot' in msg:
+            return False
+
+        activate_strings = ['開啟語音', '不要念']
+        deactivate_strings = ['關閉語音', '念出來']
+
+        for astring in activate_strings:
+            if astring in msg:
+                global speak_out
+                speak_out = True
+                print 'speak is turn on for keyword: ', astring
+                return True
+
+        for dstring in deactivate_strings:
+            if dstring in msg:
+                global speak_out
+                speak_out = False
+                print 'speak is turn off for keyword: ', dstring
+                return True
+
+        return False
+
 
     # in order to increase chitchat variety, bot will sometimes go off the rail and do something unexpected.
     # sendRandomMessage() insure bot will reply something meaningless occasionally.
@@ -498,11 +556,8 @@ class ChitChat(BotPlugin):
                 totalMessage = random.choice(action['response'])
                 response_messages = totalMessage.split('*')
 
-                for msg in response_messages:
-                    self.send(mMessage.getFrom(),
-                              msg,
-                              message_type=mMessage.getType())
-                    print' **random message "', msg, '" sended'
+                self.send_from_messages(response_messages)
+                print' **random message "', response_messages, '" sended'
 
             else:
                 if random.randrange(0, 101) > 50:
@@ -514,13 +569,11 @@ class ChitChat(BotPlugin):
 
                     response_messages = random.choice(radReply).split('*')
 
-                    for msg in response_messages:
-                        self.send(mMessage.getFrom(), msg, message_type=mMessage.getType())
-                        print' **random message "', msg, '" sended'
+                    self.send_from_messages([response_messages])
 
                 else:
-                    msg = random.choice(emoji)
-                    self.send(mMessage.getFrom(), msg, message_type=mMessage.getType())
+                    msg = random.choice([emoji])
+                    self.send_from_messages(msg)
                     print' **random message "', msg, '" sended'
 
             return True
@@ -780,11 +833,13 @@ class ChitChat(BotPlugin):
         # ###### gogobot response part #######
 
 
-        # if self.checkWantRemind(message_string):
-        # return
+
 
         # random response #1
         if self.checkSendRandomMessage():
+            return
+
+        if self.check_modify_speak_status(message_string):
             return
 
 
