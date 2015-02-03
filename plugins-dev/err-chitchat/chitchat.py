@@ -242,7 +242,9 @@ class ChitChat(BotPlugin):
             if sleep_time > 9:
                 sleep_time = 7 + random.uniform(0, 2)
 
-            time.sleep(sleep_time)
+            # speaking act as sleeping time already, no need to add extra sleep time
+            if not speak_out:
+                time.sleep(sleep_time)
 
             msg = msg.replace('randname', '@' + random.choice(self.histFrom).replace(' ', ''))
             msg = msg.replace('randmsg', random.choice(self.histMsg))
