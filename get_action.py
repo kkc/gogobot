@@ -9,7 +9,7 @@ import sys
 
 ColumnCount = 5
 show_import_star_log = False
-show_log = True
+show_log = False
 
 
 def zhprint(obj):
@@ -97,11 +97,14 @@ def refreshData(dataList, initColumn):
 
                 if show_log:
                     print 'data received'
-            else:
+            elif show_log:
                 print '*** invalid data, dropped ***'
 
     except IndexError:
-        print '*** end of lines ***'
+        if show_log:
+            print '*** end of lines ***'
+
+        print 'total action list size: ',len(dataList)
     except Exception, err:
 
         print sys.exc_info()[0]

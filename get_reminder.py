@@ -13,7 +13,7 @@ key_min = 'min'
 key_msg = 'msg'
 key_chance = 'chance'
 
-show_parse_log = True
+show_parse_log = False
 
 
 def zhprint(obj):
@@ -34,8 +34,8 @@ def load_data(dataList):
     data = wks.get_all_values()
     try:
         for r in range(1, rowCount):
-
-            print '***** getting row:', r, ' *****'
+            if show_parse_log:
+                print '***** getting row:', r, ' *****'
 
             newData = {}
             newData[key_WeekOfDay] = data[r][initColumn]
@@ -68,7 +68,7 @@ def getReminder():
     dataList = []
 
     load_data(dataList)
-    print 'total reminder count:', len(dataList)
+    print 'load reminder complete => total reminder count:', len(dataList)
 
     return dataList
 

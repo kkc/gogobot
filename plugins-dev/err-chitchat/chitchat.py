@@ -254,8 +254,8 @@ class ChitChat(BotPlugin):
             if self.ShowCompareLog:
                 zhprint(' **message "' + msg + '" sended')
 
+            # check speaker
             if speak_out and not msg.startswith('http'):
-
                 global speaker
 
                 # detect language
@@ -292,6 +292,8 @@ class ChitChat(BotPlugin):
             threading.Thread.__init__(self)
 
             self.mChitChat = chitchat_self
+
+            print 'timer thread started!'
 
 
         def run(self):
@@ -343,7 +345,7 @@ class ChitChat(BotPlugin):
 
                         if random.randrange(0, 101) < int(r[key_chance]):
                             print 'roll < ' + r[key_chance] + ', success!'
-                            self.mChitChat.send_from_messages(random.choice(r[key_msg].split('*')))
+                            self.mChitChat.send_from_messages(random.choice(r[key_msg]).split('*'))
 
                         else:
                             print 'roll > ' + r[key_chance] + ', failed!'
