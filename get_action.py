@@ -31,18 +31,26 @@ def getStarCount(list):
     return int(round((max_star + total_star_count) * 30 / keyword_count) + keyword_count) + random.randrange(0, 50)
 
 
-def refreshData(dataList, initColumn):
+def refreshData(dataList, tab_index):
     gc = gspread.login('gogobot5566', 'ilovegogobot')
-    if initColumn == 0:
-        wks = gc.open('gogobotThinkBrian').get_worksheet(1)
+
+    inti_col = 0
+
+    if tab_index == 0:
+        wks = gc.open('gogobotThinkBrian').get_worksheet(tab_index)
+        inti_col = 1
     else:
-        wks = gc.open('gogobotThinkBrian').get_worksheet(0)
+        wks = gc.open('gogobotThinkBrian').get_worksheet(tab_index)
+        inti_col = 0
+
+
     rowCount = wks.row_count
 
-    print ' '
-    if initColumn == 1:
+    # print ' '
+
+    if tab_index == 1:
         print 'start loading from spreadSheet contributed'
-    elif initColumn == 0:
+    elif tab_index == 0:
         print 'start loading from spreadSheet protected'
 
     data = wks.get_all_values()
@@ -55,21 +63,21 @@ def refreshData(dataList, initColumn):
 
             newData = {}
             newData['keyword'] = []
-            temp = data[r][initColumn]
+            temp = data[r][inti_col]
             tempArray = temp.splitlines()
             for keyword in tempArray:
                 if len(keyword) > 0:
                     newData['keyword'].append(keyword)
 
             newData['response'] = []
-            temp = data[r][initColumn + 1]
+            temp = data[r][inti_col + 1]
             tempArray = temp.splitlines()
             for res in tempArray:
                 newData['response'].append(res)
 
-            newData['chance'] = data[r][initColumn + 2]
+            newData['chance'] = data[r][inti_col + 2]
 
-            if ('TRUE' in data[r][initColumn + 3]):
+            if ('TRUE' in data[r][inti_col + 3]):
                 newData['commonDia'] = True
             else:
                 newData['commonDia'] = False
@@ -104,7 +112,7 @@ def refreshData(dataList, initColumn):
         if show_log:
             print '*** end of lines ***'
 
-        print 'total action list size: ',len(dataList)
+        print 'load from tab: ', tab_index, 'total action list size: ', len(dataList)
     except Exception, err:
 
         print sys.exc_info()[0]
@@ -113,8 +121,12 @@ def refreshData(dataList, initColumn):
 def getAction():
     dataList = []
 
-    refreshData(dataList, 0)
     refreshData(dataList, 1)
+    refreshData(dataList, 2)
+    refreshData(dataList, 3)
+
+    # contributed action
+    refreshData(dataList, 0)
 
     return dataList
 
