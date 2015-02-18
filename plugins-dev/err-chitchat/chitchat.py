@@ -33,7 +33,7 @@ from get_reminder import getReminder, key_WeekOfDay, key_Hour, key_min, key_msg,
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-MaxHistory = 40
+MaxHistory = 50
 LastUpdateTime = 0
 
 emoji = [':bowtie:', ':smile:', ':laughing:', ':blush:', ':smiley:', ':relaxed:', ':smirk:', ':heart_eyes:', ':kissing_heart:',
@@ -200,6 +200,7 @@ class ChitChat(BotPlugin):
 
     histMsg = []
     histFrom = []
+    histChecked = []
     histPisiton = 0
 
     happy = 0
@@ -397,19 +398,17 @@ class ChitChat(BotPlugin):
 
 
     def saveHist(self, message, Msgfrom):
-        if len(self.histMsg) < MaxHistory:
-            self.histMsg.append(message)
-            self.histFrom.append(Msgfrom)
-        else:
-            self.histMsg[self.histPisiton] = message
-            self.histFrom[self.histPisiton] = Msgfrom
-            print 'memory position: ', self.histPisiton
-            if self.histPisiton == MaxHistory - 1:
-                self.histPisiton = 0
-            else:
-                self.histPisiton += 1
-        if self.ShowTalkHis:
 
+        self.histMsg.append(message)
+        self.histFrom.append(Msgfrom)
+        self.histChecked.append(False)
+
+        if len(self.histMsg) > MaxHistory:
+            self.histMsg.pop(0)
+            self.histFrom.pop(0)
+            self.histChecked.pop(0)
+
+        if self.ShowTalkHis:
             print '**** printing hist msg ****'
             histMsg = []
 
@@ -417,8 +416,8 @@ class ChitChat(BotPlugin):
                 histMsg.append(msg)
             i = 0
             for name in self.histFrom:
-                histMsg[i] = name + ' said:  ' + histMsg[i]
-                i = i + 1
+                histMsg[i] = name + ' said:  ' + histMsg[i] + '   status: ' + str(self.histChecked[i])
+                i += 1
 
             for msg in histMsg:
                 zhprint(msg)
@@ -598,42 +597,42 @@ class ChitChat(BotPlugin):
         return False
 
 
-    def antiWash(self):
-        return False
-
-        # remove antiwash function
-
-        if len(self.histFrom) - self.histPisiton < 7:
-            return False
-
-        samePerson = True
-        firstPesron = self.histFrom[self.histPisiton]
-
-        i = self.histPisiton
-        while i > 0 and i > self.histPisiton - 7:
-            if firstPesron != self.histFrom[i]:
-                print 'name', self.histFrom[i]
-                samePerson = False
-                i -= 1
-                break
-
-        if samePerson:
-            if random.randrange(0, 101) > 75:
-                self.angry += 3
-                response = ['可以不要洗版了嗎？', '洗版很好玩嗎？', '不要為了要我回文亂發言好嗎？', '人的忍耐是有限度的！']
-                self.send(mMessage.getFrom(), random.choice(response), message_type=mMessage.getType())
-            else:
-                if random.randrange(0, 101) > 80:
-                    self.angry += 2
-                    self.happy += 3
-                    i = 0
-                    for msg in self.histMsg:
-                        self.send(mMessage.getFrom(), random.choice(self.histMsg), message_type=mMessage.getType())
-                        i += 1
-                        if i > 7:
-                            return True
-
-        return samePerson
+    # def antiWash(self):
+    # return False
+    #
+    # # remove antiwash function
+    #
+    #     if len(self.histFrom) - self.histPisiton < 7:
+    #         return False
+    #
+    #     samePerson = True
+    #     firstPesron = self.histFrom[self.histPisiton]
+    #
+    #     i = self.histPisiton
+    #     while i > 0 and i > self.histPisiton - 7:
+    #         if firstPesron != self.histFrom[i]:
+    #             print 'name', self.histFrom[i]
+    #             samePerson = False
+    #             i -= 1
+    #             break
+    #
+    #     if samePerson:
+    #         if random.randrange(0, 101) > 75:
+    #             self.angry += 3
+    #             response = ['可以不要洗版了嗎？', '洗版很好玩嗎？', '不要為了要我回文亂發言好嗎？', '人的忍耐是有限度的！']
+    #             self.send(mMessage.getFrom(), random.choice(response), message_type=mMessage.getType())
+    #         else:
+    #             if random.randrange(0, 101) > 80:
+    #                 self.angry += 2
+    #                 self.happy += 3
+    #                 i = 0
+    #                 for msg in self.histMsg:
+    #                     self.send(mMessage.getFrom(), random.choice(self.histMsg), message_type=mMessage.getType())
+    #                     i += 1
+    #                     if i > 7:
+    #                         return True
+    #
+    #     return samePerson
 
 
     def printCurrentEmotion(self):
@@ -767,14 +766,14 @@ class ChitChat(BotPlugin):
             self.send(mMessage.getFrom(), '@NickJian', message_type=mMessage.getType())
             print 'COMMDAND RECEIVED: gogotest'
 
-        if 'gogowash' in message:
-            if self.ShowAntiWash:
-                self.ShowAntiWash = False
-            else:
-                self.ShowAntiWash = True
-
-            self.send(mMessage.getFrom(), 'antiwash status is now :' + self.ShowAntiWash, message_type=mMessage.getType())
-            print 'COMMDAND RECEIVED: antiwash status is now :', self.ShowAntiWash
+        # if 'gogowash' in message:
+        #     if self.ShowAntiWash:
+        #         self.ShowAntiWash = False
+        #     else:
+        #         self.ShowAntiWash = True
+        #
+        #     self.send(mMessage.getFrom(), 'antiwash status is now :' + self.ShowAntiWash, message_type=mMessage.getType())
+        #     print 'COMMDAND RECEIVED: antiwash status is now :', self.ShowAntiWash
 
         if 'gogoremindlog' in message:
 
@@ -782,7 +781,7 @@ class ChitChat(BotPlugin):
                 self.show_reminder_log = False
             else:
                 self.show_reminder_log = True
-            self.send(mMessage.getFrom(), 'gogoremindlog status is now :' + self.ShowAntiWash,
+            self.send(mMessage.getFrom(), 'gogoremindlog status is now :' + self.show_reminder_log,
                       message_type=mMessage.getType())
 
 
@@ -877,8 +876,8 @@ class ChitChat(BotPlugin):
         if self.checkWeather(message_string):
             return
 
-        if self.ShowAntiWash and self.antiWash():
-            return
+        # if self.ShowAntiWash and self.antiWash():
+        #     return
 
         if self.ShowEmoLog:
             print 'emotion before update'
@@ -921,6 +920,9 @@ class ChitChat(BotPlugin):
                         response_messages = totalMessage.split('*')
 
                         self.send_from_messages(response_messages)
+                        self.histChecked[len(self.histChecked) - 1] = True
+
+                        # print 'set ',len(self.histChecked)-1 , 'to True'
 
                         return
                     elif self.ShowCompareLog:
@@ -931,6 +933,10 @@ class ChitChat(BotPlugin):
                     response_messages = totalMessage.split('*')
 
                     self.send_from_messages(response_messages)
+                    self.histChecked[len(self.histChecked) - 1] = True
+
+                    # print 'set ',len(self.histChecked)-1 , 'to True'
+
                     return
 
 

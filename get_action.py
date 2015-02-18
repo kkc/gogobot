@@ -112,7 +112,7 @@ def refreshData(dataList, tab_index):
         if show_log:
             print '*** end of lines ***'
 
-        print 'load from tab: ', tab_index, 'total action list size: ', len(dataList)
+        print 'load from tab: ', tab_index, '    total action list size: ', len(dataList)
     except Exception, err:
 
         print sys.exc_info()[0]
