@@ -232,6 +232,8 @@ class ChitChat(BotPlugin):
     # mSelf =''
 
     def send_from_messages(self, message_list):
+        msg_count = 0
+
         for msg in message_list:
 
             msg_len = len(msg)
@@ -243,7 +245,7 @@ class ChitChat(BotPlugin):
                 sleep_time = 7 + random.uniform(0, 2)
 
             # speaking act as sleeping time already, no need to add extra sleep time
-            if not speak_out:
+            if not speak_out or msg_count == 0:
                 time.sleep(sleep_time)
 
             msg = msg.replace('randname', '@' + random.choice(self.histFrom).replace(' ', ''))
@@ -253,6 +255,8 @@ class ChitChat(BotPlugin):
 
             if self.ShowCompareLog:
                 zhprint(' **message "' + msg + '" sended')
+
+            msg_count += 1
 
             # check speaker
             if speak_out and not msg.startswith('http'):
@@ -265,7 +269,7 @@ class ChitChat(BotPlugin):
 
                 if len(speaker) > 0:
                     call(["say", "-v", speaker, msg])
-                    print 'speak as custom speaker: ',speaker
+                    print 'speak as custom speaker: ', speaker
                     # reset speaker
                     speaker = ''
 
