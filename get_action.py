@@ -23,6 +23,11 @@ def getStarCount(list):
     total_star_count = 0
     max_star = 0
     keyword_count = 0
+
+    # gogobot is too easy to trigger, assign 0 star to it.
+    if len(list) == 1 and list[0] == 'gogobot':
+        return 0
+
     for text in list:
         if text.count('*') > max_star:
             max_star = text.count('*')
@@ -42,7 +47,6 @@ def refreshData(dataList, tab_index):
     else:
         wks = gc.open('gogobotThinkBrian').get_worksheet(tab_index)
         inti_col = 0
-
 
     rowCount = wks.row_count
 

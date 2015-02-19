@@ -33,7 +33,12 @@ from get_reminder import getReminder, key_WeekOfDay, key_Hour, key_min, key_msg,
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
+# how many lines of dialog will gogobot remember
 MaxHistory = 50
+
+# how many lines of dialog will gogobot consider it as message to gogobot itself
+MaxComprehensiveLine = 4
+
 LastUpdateTime = 0
 
 emoji = [':bowtie:', ':smile:', ':laughing:', ':blush:', ':smiley:', ':relaxed:', ':smirk:', ':heart_eyes:', ':kissing_heart:',
@@ -158,6 +163,8 @@ mReminder = ''
 speaker = ''
 speak_out = True
 
+lsat_idx = 0
+
 
 
 
@@ -258,6 +265,11 @@ class ChitChat(BotPlugin):
                 zhprint(' **message "' + msg + '" sended')
 
             msg_count += 1
+
+            idx = lsat_idx
+            while idx < len(self.histMsg):
+                self.histChecked[idx] = True
+                idx += 1
 
             # check speaker
             if speak_out and not msg.startswith('http'):
@@ -450,7 +462,7 @@ class ChitChat(BotPlugin):
             return False
         else:
 
-            if self.checkIfContain([u'天氣', u'氣溫'], message_string):
+            if self.checkIfContain([u'天氣', u'氣溫']):
                 # otherDes = [u'早上', u'晚上', u'飯', u'上班', u'餐', u'下班', u'出門']
                 #
                 # print 'check weather roll success, keyword matched'
@@ -602,21 +614,21 @@ class ChitChat(BotPlugin):
     #
     # # remove antiwash function
     #
-    #     if len(self.histFrom) - self.histPisiton < 7:
-    #         return False
+    # if len(self.histFrom) - self.histPisiton < 7:
+    # return False
     #
-    #     samePerson = True
-    #     firstPesron = self.histFrom[self.histPisiton]
+    # samePerson = True
+    # firstPesron = self.histFrom[self.histPisiton]
     #
-    #     i = self.histPisiton
-    #     while i > 0 and i > self.histPisiton - 7:
-    #         if firstPesron != self.histFrom[i]:
-    #             print 'name', self.histFrom[i]
-    #             samePerson = False
-    #             i -= 1
-    #             break
+    # i = self.histPisiton
+    # while i > 0 and i > self.histPisiton - 7:
+    # if firstPesron != self.histFrom[i]:
+    # print 'name', self.histFrom[i]
+    # samePerson = False
+    # i -= 1
+    # break
     #
-    #     if samePerson:
+    # if samePerson:
     #         if random.randrange(0, 101) > 75:
     #             self.angry += 3
     #             response = ['可以不要洗版了嗎？', '洗版很好玩嗎？', '不要為了要我回文亂發言好嗎？', '人的忍耐是有限度的！']
@@ -641,37 +653,50 @@ class ChitChat(BotPlugin):
         print'*** lastCheckTime: ', self.lastCheckTime, ' ***'
 
 
-    def checkIfContain(self, keyArray, message_string):
+    def checkIfContain(self, keyArray):
         # total key array
         for key in keyArray:
             keyArray_ = key.split('*')
-            tempbool = True
 
-            # must match every key in keyArray_
+            # is this a key for 'gogobot personal chat'?
+            is_gogobot_key = False
+
             for key_ in keyArray_:
-                # print 'cheking key: ' + key
-                if 'randname' in key_:
-                    tempbool2 = False
-                    tempString = ''
+                if key_.lower() == 'gogobot':
+                    is_gogobot_key = True
 
-                    # match one of name in hisFrom
-                    for hisName in self.histFrom:
-                        tempString = key_.replace('randname', hisName)
-                        if tempString in message_string:
-                            tempbool2 = True
-                            break
+            message = ''
+            idx = len(self.histMsg)
 
-                    if tempbool2 != True:
-                        tempbool = False
+            if is_gogobot_key:
 
 
-                elif not (key_ in message_string):
-                    # print 'do not contain ' + key
-                    tempbool = False
-                    break
+                print str(idx - 1 >= 0), '!!!!', str((len(self.histMsg) - 1) - idx <= MaxComprehensiveLine)
 
-            if tempbool:
+                while idx - 1 >= 0 and (len(self.histMsg) - 1) - idx <= MaxComprehensiveLine:
+                    idx -= 1
+                    print 'current idx: ', idx, '  msg: ', self.histMsg[idx], 'isChecked: ', self.histChecked[idx]
+
+                    if self.histChecked[idx] == False:
+                        message = message + self.histMsg[idx]
+
+                print 'appended message: ', message
+
+            else:
+                message = self.histMsg[len(self.histMsg) - 1]
+
+            match_key = True
+
+            for key_ in keyArray_:
+                if key_ not in message:
+                    match_key = False
+
+            if match_key:
+                global lsat_idx
+                lsat_idx = idx
+
                 return True
+
         return False
 
 
@@ -717,17 +742,17 @@ class ChitChat(BotPlugin):
         self.lastCheckTime = int(time.time())
 
         # update emo with new input
-        if self.checkIfContain(happyString, message_string):
+        if self.checkIfContain(happyString):
             if self.ShowEmoLog:
                 print 'happy str matched: ' + message_string
             self.happy += 1
 
-        if self.checkIfContain(sadString, message_string):
+        if self.checkIfContain(sadString):
             if self.ShowEmoLog:
                 print 'sad str matched: ' + message_string
             self.sad += 1
 
-        if self.checkIfContain(angryString, message_string):
+        if self.checkIfContain(angryString):
             if self.ShowEmoLog:
                 print 'angry str matched: ' + message_string
             self.angry += 1
@@ -906,13 +931,13 @@ class ChitChat(BotPlugin):
                     counter = 0
                     Appendedkeyword = ' '
 
-            if self.checkIfContain(action['keyword'], message_string):
+            if self.checkIfContain(action['keyword']):
                 if self.ShowCompareLog:
                     print '"', action['keyword'][0], '" matched'
 
                 if 'chance' in action:
                     if self.ShowCompareLog:
-                        zhprint(' ** ' + ''.join(action['keyword']) + 'has roll-key, have to roll ')
+                        zhprint(' ** ' + ''.join(action['keyword']) + ' has roll-key, have to roll ')
                     if random.randrange(0, 101) < int(action['chance']):
                         if self.ShowCompareLog:
                             print ' **rand < ', action['chance'], ', roll success!!'
