@@ -629,9 +629,9 @@ class ChitChat(BotPlugin):
     # break
     #
     # if samePerson:
-    #         if random.randrange(0, 101) > 75:
-    #             self.angry += 3
-    #             response = ['可以不要洗版了嗎？', '洗版很好玩嗎？', '不要為了要我回文亂發言好嗎？', '人的忍耐是有限度的！']
+    # if random.randrange(0, 101) > 75:
+    # self.angry += 3
+    # response = ['可以不要洗版了嗎？', '洗版很好玩嗎？', '不要為了要我回文亂發言好嗎？', '人的忍耐是有限度的！']
     #             self.send(mMessage.getFrom(), random.choice(response), message_type=mMessage.getType())
     #         else:
     #             if random.randrange(0, 101) > 80:
@@ -677,7 +677,7 @@ class ChitChat(BotPlugin):
                     idx -= 1
                     print 'current idx: ', idx, '  msg: ', self.histMsg[idx], 'isChecked: ', self.histChecked[idx]
 
-                    if self.histChecked[idx] == False:
+                    if self.histChecked[idx] == False or (len(self.histMsg[idx]) < 10 and 'gogobot' in self.histMsg[idx].lower()):
                         message = message + self.histMsg[idx]
 
                 print 'appended message: ', message
