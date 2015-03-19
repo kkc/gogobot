@@ -439,7 +439,7 @@ class ChitChat(BotPlugin):
 
     def searchPhoto(self, message_string):
 
-        if (not 'gogobot' in message_string) and (random.random() > 0.2):
+        if (not '@gogobot' in message_string) and (random.random() > 0.2):
             print '**** send search photo FAIL: not for gogobot and random number is less 0.2 ****'
             return False
 
