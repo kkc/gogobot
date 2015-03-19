@@ -13,7 +13,7 @@ errbot plugin - ChitChat
 Just messing around~
 
 """
-
+import urllib
 import json
 import random
 import threading
@@ -439,11 +439,13 @@ class ChitChat(BotPlugin):
 
     def searchPhoto(self, message_string):
 
-        if (not 'gogobot' in message_string) and (random.random() > 0.5):
-            print '**** send search photo FAIL: not for gogobot ****'
+        if (not 'gogobot' in message_string) and (random.random() > 0.2):
+            print '**** send search photo FAIL: not for gogobot and random number is less 0.2 ****'
             return False
 
-        responseData = json.loads(requests.get('https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q='+message_string).content)
+        q = { 'v' : '1.0', 'q' : message_string.replace("gogobot", "").replace("@", "").replace(": ", "")}
+        print '**** search photo url: ' + 'https://ajax.googleapis.com/ajax/services/search/images?' + urllib.urlencode(q) + ' ****'
+        responseData = json.loads(requests.get('https://ajax.googleapis.com/ajax/services/search/images?' + urllib.urlencode(q)).content)
         
         if not responseData:
             print '**** send search photo FAIL: responseData == null ****'
