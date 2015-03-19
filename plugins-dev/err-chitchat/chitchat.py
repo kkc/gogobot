@@ -437,15 +437,33 @@ class ChitChat(BotPlugin):
             print '**** end of hist ****'
 
 
-    def getgirls(self, message):
-        a = json.loads(
-            requests.get('http://curator.im/api/stream/?token=3b57cbb863364e9eb2f4cd7f833df331&page=' + str(
-                int(random.random() * 140))).content)
-        index = int(random.random() * 50)
-        self.girl_source = "小海嚴選正妹 - " + \
-                           a['results'][index]['name'] + " - " + a['results'][index]['url']
+    def searchPhoto(self, message_string):
 
-        return a['results'][index]['image']
+        if (not 'gogobot' in message_string) and (random.random() > 0.5):
+            print '**** send search photo FAIL: not for gogobot ****'
+            return False
+
+        responseData = json.loads(requests.get('https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q='+message_string).content)
+        
+        if not responseData:
+            print '**** send search photo FAIL: responseData == null ****'
+            return False
+
+        length = len(responseData['responseData']['results'])
+
+        if length == 0:
+            print '**** send search photo FAIL: length == 0 ****'
+            return False
+
+        index = int(random.random() * length)
+        photo = responseData['responseData']['results'][index]['url']
+        if photo:
+            print '**** send search photo: ' + photo + ' ****'
+            self.send_from_messages([photo])
+            return True
+        else:
+            print '**** send search photo FAIL: photo == null ****'
+            return False
 
 
     # check if previous talk contain keyword
@@ -964,6 +982,9 @@ class ChitChat(BotPlugin):
 
                     return
 
+
+        if self.searchPhoto(message_string):
+            return
 
         # random response #2
         if self.checkSendRandomMessage():
