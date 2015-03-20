@@ -437,34 +437,42 @@ class ChitChat(BotPlugin):
             print '**** end of hist ****'
 
 
-    def searchPhoto(self, message_string):
+    def searchResult(self, message_string):
 
         if (not '@gogobot' in message_string) and (random.random() > 0.2):
-            print '**** send search photo FAIL: not for gogobot and random number is less 0.2 ****'
+            print '**** send search result FAIL: not for gogobot and random number is less 0.2 ****'
             return False
 
+        # http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=看正妹
+        # https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=看正妹
+
+        domain = 'http://ajax.googleapis.com/ajax/services/search/images?'
+        if ('會' in message_string):
+            domain = 'http://ajax.googleapis.com/ajax/services/search/web?'
+            # domain = 'http://ajax.googleapis.com/ajax/services/search/images?'
+
         q = { 'v' : '1.0', 'q' : message_string.replace("gogobot", "").replace("@", "").replace(": ", "")}
-        print '**** search photo url: ' + 'https://ajax.googleapis.com/ajax/services/search/images?' + urllib.urlencode(q) + ' ****'
-        responseData = json.loads(requests.get('https://ajax.googleapis.com/ajax/services/search/images?' + urllib.urlencode(q)).content)
+        print '**** search result url: ' + domain + urllib.urlencode(q) + ' ****'
+        responseData = json.loads(requests.get(domain + urllib.urlencode(q)).content)
         
         if not responseData:
-            print '**** send search photo FAIL: responseData == null ****'
+            print '**** send search result FAIL: responseData == null ****'
             return False
 
         length = len(responseData['responseData']['results'])
 
         if length == 0:
-            print '**** send search photo FAIL: length == 0 ****'
+            print '**** send search result FAIL: length == 0 ****'
             return False
 
         index = int(random.random() * length)
-        photo = responseData['responseData']['results'][index]['url']
-        if photo:
-            print '**** send search photo: ' + photo + ' ****'
-            self.send_from_messages([photo])
+        result = responseData['responseData']['results'][index]['url']
+        if result:
+            print '**** send search result: ' + result + ' ****'
+            self.send_from_messages([result])
             return True
         else:
-            print '**** send search photo FAIL: photo == null ****'
+            print '**** send search result FAIL: result == null ****'
             return False
 
 
@@ -985,7 +993,7 @@ class ChitChat(BotPlugin):
                     return
 
 
-        if self.searchPhoto(message_string):
+        if self.searchResult(message_string):
             return
 
         # random response #2
