@@ -260,7 +260,7 @@ class ChitChat(BotPlugin):
 
             msg = msg.replace('randname', '@' + random.choice(self.histFrom).replace(' ', ''))
             msg = msg.replace('randmsg', random.choice(self.histMsg))
-            msg = msg.replace('@gogobot:', "")
+            msg = msg.replace('@gogobot', "我")
 
             self.send(mMessage.getFrom(), msg, message_type=mMessage.getType())
 
@@ -439,6 +439,62 @@ class ChitChat(BotPlugin):
 
             print '**** end of hist ****'
 
+    def longestSubstringFinder(self, S,T):
+        m = len(S)
+        n = len(T)
+        counter = [[0]*(n+1) for x in range(m+1)]
+        longest = 0
+        lcs_set = set()
+        for i in range(m):
+            for j in range(n):
+                if S[i] == T[j]:
+                    c = counter[i][j] + 1
+                    counter[i+1][j+1] = c
+                    if c > longest:
+                        lcs_set = set()
+                        longest = c
+                        lcs_set.add(S[i-c+1:i+1])
+                    elif c == longest:
+                        lcs_set.add(S[i-c+1:i+1])
+        result = ""
+        for item in lcs_set:
+            result = result + item
+        return result 
+
+    def extractKeyword(self, message_string):
+        param_q = message_string.replace('gogobot', '').replace('@', '').replace(': ', '');
+        param_q = param_q.replace('你', '').replace('會', '').replace('嗎', '').replace('?', '')
+
+        if len(param_q) == 1:
+            return param_q
+
+        # http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=看正妹
+        domain = 'http://ajax.googleapis.com/ajax/services/search/web?'
+        q = { 'v' : '1.0', 'q' : param_q }
+        print '**** search result url for keyword: ' + domain + urllib.urlencode(q) + ' ****'
+        responseData = json.loads(requests.get(domain + urllib.urlencode(q)).content)
+        if not responseData:
+            print '**** search result url for keyword FAIL: responseData == null ****'
+            return param_q
+
+        length = len(responseData['responseData']['results'])
+
+        if length == 0:
+            print '**** search result url for keyword FAIL: length == 0 ****'
+            return param_q
+
+        longest_keyword = ""
+        for responseItem in responseData['responseData']['results']:
+            titleNoFormatting = responseItem['titleNoFormatting']
+            keyword = self.longestSubstringFinder(titleNoFormatting, param_q)
+            if len(keyword) >= len(longest_keyword):
+                longest_keyword = keyword
+            print '**** search result url for keyword: '+keyword+' ****'
+
+        if len(longest_keyword) > 1:
+            return longest_keyword
+
+        return param_q
 
     def searchResult(self, message_string):
 
@@ -450,11 +506,16 @@ class ChitChat(BotPlugin):
         # https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=看正妹
 
         domain = 'http://ajax.googleapis.com/ajax/services/search/images?'
-        param_q = message_string.replace("gogobot", "").replace("@", "").replace(": ", "");
+        param_q = self.extractKeyword(message_string)
+        url_tag = 'url'
+
+        if len(param_q) == 0:
+            print '**** send search result FAIL: cannot find keyword ****'
+            return False
 
         if ('gogobot' in message_string and '會' in message_string):
             domain = 'http://ajax.googleapis.com/ajax/services/search/web?'
-            param_q = param_q.replace("你", "").replace("會", "").replace("嗎", "").replace("?", "")
+            url_tag = 'cacheUrl'
             replyArray = ["這還用問嗎?", "我是精英耶！", "Of Course~", "你哪位?問這麼沒水準的問題"]
             reply = random.choice(replyArray)
             self.send_from_messages([reply])
@@ -470,7 +531,7 @@ class ChitChat(BotPlugin):
             preReply = random.choice(preReplyArray)
             self.send_from_messages([preReply])
 
-        startArray = ['0', '4', '8']
+        startArray = ['0', '0', '0', '4', '4', '8']
         start = random.choice(startArray)
         q = { 'v' : '1.0', 'q' : param_q, 'start' : start}
         print '**** search result url: ' + domain + urllib.urlencode(q) + ' ****'
@@ -487,15 +548,14 @@ class ChitChat(BotPlugin):
             return False
 
         index = int(random.random() * length)
-        result = responseData['responseData']['results'][index]['url']
+        result = responseData['responseData']['results'][index][url_tag]
         if result:
             print '**** send search result: ' + result + ' ****'
             self.send_from_messages([result])
             return True
         else:
             print '**** send search result FAIL: result == null ****'
-            return False
-
+            return False   
 
     # check if previous talk contain keyword
     def prevContain(self, keywordArray):
