@@ -249,7 +249,9 @@ class ChitChat(BotPlugin):
                 msg_len = 5
 
             sleep_time = random.uniform(0, 0.3) * msg_len
-            if sleep_time > 9:
+            if(msg.startswith('http')):
+                sleep_time = 1
+            elif sleep_time > 9:
                 sleep_time = 7 + random.uniform(0, 2)
 
             # speaking act as sleeping time already, no need to add extra sleep time
@@ -258,6 +260,7 @@ class ChitChat(BotPlugin):
 
             msg = msg.replace('randname', '@' + random.choice(self.histFrom).replace(' ', ''))
             msg = msg.replace('randmsg', random.choice(self.histMsg))
+            msg = msg.replace('@gogobot:', "")
 
             self.send(mMessage.getFrom(), msg, message_type=mMessage.getType())
 
@@ -439,19 +442,37 @@ class ChitChat(BotPlugin):
 
     def searchResult(self, message_string):
 
-        if (not '@gogobot' in message_string) and (random.random() > 0.2):
-            print '**** send search result FAIL: not for gogobot and random number is less 0.2 ****'
+        if (not '@gogobot' in message_string) and (random.random() <= 0.9):
+            print '**** send search result FAIL: not for gogobot and random number is less 0.9 ****'
             return False
 
         # http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=看正妹
         # https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=看正妹
 
         domain = 'http://ajax.googleapis.com/ajax/services/search/images?'
-        if ('會' in message_string):
-            domain = 'http://ajax.googleapis.com/ajax/services/search/web?'
-            # domain = 'http://ajax.googleapis.com/ajax/services/search/images?'
+        param_q = message_string.replace("gogobot", "").replace("@", "").replace(": ", "");
 
-        q = { 'v' : '1.0', 'q' : message_string.replace("gogobot", "").replace("@", "").replace(": ", "")}
+        if ('gogobot' in message_string and '會' in message_string):
+            domain = 'http://ajax.googleapis.com/ajax/services/search/web?'
+            param_q = param_q.replace("你", "").replace("會", "").replace("嗎", "").replace("?", "")
+            replyArray = ["這還用問嗎?", "我是精英耶！", "Of Course~", "你哪位?問這麼沒水準的問題"]
+            reply = random.choice(replyArray)
+            self.send_from_messages([reply])
+        elif ('gogobot' in message_string and random.random() <= 0.4): # 中斷掉要gogobot找圖功能
+            replyArray = ["我也不是隨隨便便教人的，先走了，掰", "叫我出聲我就出聲，那豈不是很沒面子，先洗澡了，掰", "你來?我媽叫我吃飯了，掰"]
+            reply = random.choice(replyArray)
+            print '**** send interrupted reply: ' + reply + ' ****'
+            self.send_from_messages([reply])
+            return True
+
+        if 'gogobot' in message_string:
+            preReplyArray = ["看在你誠心誠意的份上，好吧", "我也不是隨便的人，但今天就如你所願", "既然你誠心誠意的呼喊我了"]
+            preReply = random.choice(preReplyArray)
+            self.send_from_messages([preReply])
+
+        startArray = ['0', '4', '8']
+        start = random.choice(startArray)
+        q = { 'v' : '1.0', 'q' : param_q, 'start' : start}
         print '**** search result url: ' + domain + urllib.urlencode(q) + ' ****'
         responseData = json.loads(requests.get(domain + urllib.urlencode(q)).content)
         
