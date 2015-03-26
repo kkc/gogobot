@@ -540,7 +540,7 @@ class ChitChat(BotPlugin):
                 self.send_from_messages([reply])
                 return True
 
-        if 'gogobot' in message_string and ('會' in message_string or '知道' in message_string or '曉得' in message_string or '了解' in message_string or '瞭解' in message_stringor  or'熟悉' in message_string or '懂' in message_string):
+        if 'gogobot' in message_string and ('會' in message_string or '知道' in message_string or '曉得' in message_string or '了解' in message_string or '瞭解' in message_string or '熟悉' in message_string or '懂' in message_string):
             domain = 'http://ajax.googleapis.com/ajax/services/search/web?'
             url_tag = 'cacheUrl'
 
@@ -574,7 +574,7 @@ class ChitChat(BotPlugin):
                 return True
 
             if 'gogobot' in message_string:
-                if '會' in message_string or '知道' in message_string or '曉得' in message_string or '了解' in message_string or '瞭解' in message_stringor or '熟悉' in message_stringor or '懂' in message_string:
+                if '會' in message_string or '知道' in message_string or '曉得' in message_string or '了解' in message_string or '瞭解' in message_string or '熟悉' in message_string or '懂' in message_string:
                     replyArray = ['這還用問嗎?', '我是精英耶！', 'Of Course~', '你哪位?', '問這麼沒水準的問題']
                     reply = random.choice(replyArray) + ' ' + random.choice(replyArray)
                     self.send_from_messages([reply])
