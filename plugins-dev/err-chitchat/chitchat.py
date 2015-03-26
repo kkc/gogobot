@@ -546,7 +546,7 @@ class ChitChat(BotPlugin):
 
         startArray = ['0', '0', '0', '4', '4', '8']
         start = random.choice(startArray)
-        q = { 'v' : '1.0', 'q' : param_q, 'start' : start}
+        q = { 'v' : '1.0', 'q' : param_q, 'start' : start, 'safe' : 'active'}
         print '**** search result url: ' + domain + urllib.urlencode(q) + ' ****'
         responseData = json.loads(requests.get(domain + urllib.urlencode(q)).content)
         
@@ -565,7 +565,6 @@ class ChitChat(BotPlugin):
         index = int(random.random() * length)
         result = responseData['responseData']['results'][index][url_tag]
         if result:
-
             print '**** check search result: ' + result + ' ****'
             checkAvailable = urllib.urlopen(result)
             if checkAvailable.getcode() == 404:
