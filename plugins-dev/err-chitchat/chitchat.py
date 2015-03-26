@@ -439,7 +439,7 @@ class ChitChat(BotPlugin):
 
             print '**** end of hist ****'
 
-    def longestSubstringFinder(self, source,target):
+    def findLongestSubstring(self, source,target):
         m = len(source)
         n = len(target)
         counter = [[0]*(n+1) for x in range(m+1)]
@@ -464,6 +464,7 @@ class ChitChat(BotPlugin):
     def extractKeyword(self, message_string):
         param_q = message_string.replace('gogobot', '').replace('@', '').replace(': ', '');
         param_q = param_q.replace('你', '').replace('我', '').replace('他', '')
+        param_q = param_q.replace('請問', '')
         param_q = param_q.replace('可以', '').replace('會', '').replace('能', '').replace('是', '')
         param_q = param_q.replace('知道', '').replace('了解', '').replace('曉得', '').replace('熟悉', '')
         param_q = param_q.replace('了', '').replace('吧', '').replace('呢', '').replace('嗎', '')
@@ -490,7 +491,7 @@ class ChitChat(BotPlugin):
         longest_keyword = ""
         for responseItem in responseData['responseData']['results']:
             titleNoFormatting = responseItem['titleNoFormatting']
-            keyword = self.longestSubstringFinder(titleNoFormatting, param_q)
+            keyword = self.findLongestSubstring(titleNoFormatting, param_q)
             if len(keyword) >= len(longest_keyword):
                 longest_keyword = keyword
             print '**** search result url for keyword: '+keyword+' ****'
@@ -525,16 +526,17 @@ class ChitChat(BotPlugin):
                 reply = random.choice(replyArray)
                 self.send_from_messages([reply])
             elif ('gogobot' in message_string and random.random() <= 0.4): # 中斷掉要gogobot找圖功能
-                replyArray = ['我也不是隨隨便便教人的，先走了，掰', '叫我出聲我就出聲，那豈不是很沒面子，先洗澡了，掰', '你自己來?我媽叫我吃飯了，掰', '想問我的話要加請問', '小朋友，問人問題要加請問喔!', '小朋友，問人問題要加請問喔!']
+                replyArray = ['很可怕，不要問', '我也不是隨隨便便教人的，先走了，掰', '叫我出聲我就出聲，那豈不是很沒面子，先洗澡了，掰', '你自己來?我媽叫我吃飯了，掰', '想問我的話要加請問', '小朋友，問人問題要加請問喔!', '小朋友，問人問題要加請問喔!']
                 reply = random.choice(replyArray)
                 print '**** send interrupted reply: ' + reply + ' ****'
                 self.send_from_messages([reply])
                 return True
 
         if 'gogobot' in message_string:
-            preReplyArray = ['看在你誠心誠意的份上，好吧', '我也不是隨便的人，不過既然你不恥上問了', '既然你誠心誠意的呼喊我了', '我想你要的應該就是這個了', '我想想看，是這個嗎?']
-            preReply = random.choice(preReplyArray)
-            self.send_from_messages([preReply])
+            preReplyArray = ['經過我媲美google的龐大資料庫搜尋後', '看在你誠心誠意的份上', '我也不是隨便的人', '經過我的工人智慧判斷', '我想想看']
+            postReplyArray = ['...好吧', '，就賞你一個...', '，一定就是這個了', '，是這個嗎?']
+            catReply = random.choice(preReplyArray) + random.choice(postReplyArray)
+            self.send_from_messages([catReply])
 
         startArray = ['0', '0', '0', '4', '4', '8']
         start = random.choice(startArray)
