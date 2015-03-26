@@ -463,8 +463,10 @@ class ChitChat(BotPlugin):
 
     def extractKeyword(self, message_string):
         param_q = message_string.replace('gogobot', '').replace('@', '').replace(': ', '');
-        param_q = param_q.replace('你', '').replace('我', '').replace('他', '')
+        param_q = param_q.replace('你', '').replace('妳', '').replace('我', '').replace('他', '').replace('她', '').replace('它', '').replace('祂', '')
         param_q = param_q.replace('請問', '')
+        param_q = param_q.replace('可不可以', '').replace('會不會', '').replace('能不能', '').replace('是不是', '')
+        param_q = param_q.replace('知不知道', '').replace('了不了解', '').replace('曉不曉得', '').replace('熟不熟悉', '')
         param_q = param_q.replace('可以', '').replace('會', '').replace('能', '').replace('是', '')
         param_q = param_q.replace('知道', '').replace('了解', '').replace('曉得', '').replace('熟悉', '')
         param_q = param_q.replace('了', '').replace('吧', '').replace('呢', '').replace('嗎', '')
