@@ -505,9 +505,14 @@ class ChitChat(BotPlugin):
 
     def searchResult(self, message_string):
 
-        if (not '@gogobot' in message_string) and (random.random() <= 0.9):
-            print '**** send search result FAIL: not for gogobot and random number is less 0.9 ****'
+        if (not '@gogobot' in message_string) and (random.random() <= 0.95):
+            print '**** send search result FAIL: not for gogobot and random number is less 0.95 ****'
             return False
+
+        if ('@gogobot' in message_string) and ('你' in message_string) and ('怎麼' in message_string) and ('在' in message_string):
+            self.send_from_messages(['嚴格來說，我也是開發者啊'])
+            return True
+
 
         # http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=看正妹
         # https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=看正妹
