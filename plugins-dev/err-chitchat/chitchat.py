@@ -466,9 +466,9 @@ class ChitChat(BotPlugin):
         param_q = param_q.replace('你', '').replace('妳', '').replace('我', '').replace('他', '').replace('她', '').replace('它', '').replace('祂', '')
         param_q = param_q.replace('請問', '')
         param_q = param_q.replace('可不可以', '').replace('會不會', '').replace('能不能', '').replace('是不是', '')
-        param_q = param_q.replace('知不知道', '').replace('了不了解', '').replace('曉不曉得', '').replace('熟不熟悉', '')
+        param_q = param_q.replace('知不知道', '').replace('了不了解', '').replace('瞭不瞭解', '').replace('曉不曉得', '').replace('熟不熟悉', '').replace('懂不懂', '')
         param_q = param_q.replace('可以', '').replace('會', '').replace('能', '').replace('是', '')
-        param_q = param_q.replace('知道', '').replace('了解', '').replace('曉得', '').replace('熟悉', '')
+        param_q = param_q.replace('知道', '').replace('了解', '').replace('瞭解', '').replace('曉得', '').replace('熟悉', '').replace('懂', '')
         param_q = param_q.replace('了', '').replace('吧', '').replace('呢', '').replace('嗎', '')
         param_q = param_q.replace('?', '').replace('!', '')
 
@@ -503,6 +503,12 @@ class ChitChat(BotPlugin):
 
         return param_q
 
+    def replySearchResultFail(self):
+        preReplyArray = ['我找不到，我找不到', '我不會，我不會', '這就是我的極限啊', '我也不知道']
+        postReplyArray = ['(掩面)', '(已哭)', '，為什麼要逼我!?', '(已難過)', ' :weary ']
+        catReply = random.choice(preReplyArray) + random.choice(postReplyArray)
+        self.send_from_messages([catReply])
+
     def searchResult(self, message_string):
 
         if (not '@gogobot' in message_string) and (random.random() <= 0.95):
@@ -525,19 +531,18 @@ class ChitChat(BotPlugin):
             print '**** send search result FAIL: cannot find keyword ****'
             return False
 
+
         if not '請問' in message_string:
-            if ('gogobot' in message_string and '會' in message_string):
-                domain = 'http://ajax.googleapis.com/ajax/services/search/web?'
-                url_tag = 'cacheUrl'
-                replyArray = ['這還用問嗎?", "我是精英耶！', 'Of Course~', '你哪位?問這麼沒水準的問題']
-                reply = random.choice(replyArray)
-                self.send_from_messages([reply])
-            elif ('gogobot' in message_string and random.random() <= 0.4): # 中斷掉要gogobot找圖功能
+            if ('gogobot' in message_string and random.random() <= 0.4): # 中斷掉要gogobot找圖功能
                 replyArray = ['很可怕，不要問', '我也不是隨隨便便教人的，先走了，掰', '叫我出聲我就出聲，那豈不是很沒面子，先洗澡了，掰', '你自己來?我媽叫我吃飯了，掰', '想問我的話要加請問', '小朋友，問人問題要加請問喔!', '小朋友，問人問題要加請問喔!']
                 reply = random.choice(replyArray)
                 print '**** send interrupted reply: ' + reply + ' ****'
                 self.send_from_messages([reply])
                 return True
+
+        if 'gogobot' in message_string and ('會' in message_string or '知道' in message_string or '曉得' in message_string or '了解' in message_string or '瞭解' in message_stringor  or'熟悉' in message_string or '懂' in message_string):
+            domain = 'http://ajax.googleapis.com/ajax/services/search/web?'
+            url_tag = 'cacheUrl'
 
         startArray = ['0', '0', '0', '4', '4', '8']
         start = random.choice(startArray)
@@ -547,13 +552,15 @@ class ChitChat(BotPlugin):
         
         if not responseData:
             print '**** send search result FAIL: responseData == null ****'
-            return False
+            self.replySearchResultFail()
+            return True
 
         length = len(responseData['responseData']['results'])
 
         if length == 0:
             print '**** send search result FAIL: length == 0 ****'
-            return False
+            self.replySearchResultFail()
+            return True
 
         index = int(random.random() * length)
         result = responseData['responseData']['results'][index][url_tag]
@@ -563,13 +570,15 @@ class ChitChat(BotPlugin):
             checkAvailable = urllib.urlopen(result)
             if checkAvailable.getcode() == 404:
                 print '**** check search result FAIL: result is 404 ****'
-                preReplyArray = ['我找不到，我找不到', '我不會，我不會', '我不知道，這就是我的極限啊']
-                postReplyArray = ['(掩面)', '(已哭)', '，為什麼要逼我!?', '(已難過)', ' :weary ']
-                catReply = random.choice(preReplyArray) + random.choice(postReplyArray)
-                self.send_from_messages([catReply])
+                self.replySearchResultFail()
                 return True
 
             if 'gogobot' in message_string:
+                if '會' in message_string or '知道' in message_string or '曉得' in message_string or '了解' in message_string or '瞭解' in message_stringor or '熟悉' in message_stringor or '懂' in message_string:
+                    replyArray = ['這還用問嗎?', '我是精英耶！', 'Of Course~', '你哪位?', '問這麼沒水準的問題']
+                    reply = random.choice(replyArray) + ' ' + random.choice(replyArray)
+                    self.send_from_messages([reply])
+
                 preReplyArray = ['經過我媲美google的龐大資料庫搜尋後', '看在你誠心誠意的份上', '我也不是隨便的人', '經過我的工人智慧判斷', '我想想看']
                 postReplyArray = ['...好吧', '，就賞你一個...', '，一定就是這個了', '，是這個嗎?']
                 catReply = random.choice(preReplyArray) + random.choice(postReplyArray)
@@ -580,7 +589,8 @@ class ChitChat(BotPlugin):
             return True
         else:
             print '**** send search result FAIL: result == null ****'
-            return False   
+            self.replySearchResultFail()
+            return True
 
     # check if previous talk contain keyword
     def prevContain(self, keywordArray):
