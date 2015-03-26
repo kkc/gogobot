@@ -539,12 +539,6 @@ class ChitChat(BotPlugin):
                 self.send_from_messages([reply])
                 return True
 
-        if 'gogobot' in message_string:
-            preReplyArray = ['經過我媲美google的龐大資料庫搜尋後', '看在你誠心誠意的份上', '我也不是隨便的人', '經過我的工人智慧判斷', '我想想看']
-            postReplyArray = ['...好吧', '，就賞你一個...', '，一定就是這個了', '，是這個嗎?']
-            catReply = random.choice(preReplyArray) + random.choice(postReplyArray)
-            self.send_from_messages([catReply])
-
         startArray = ['0', '0', '0', '4', '4', '8']
         start = random.choice(startArray)
         q = { 'v' : '1.0', 'q' : param_q, 'start' : start}
@@ -564,6 +558,23 @@ class ChitChat(BotPlugin):
         index = int(random.random() * length)
         result = responseData['responseData']['results'][index][url_tag]
         if result:
+
+            print '**** check search result: ' + result + ' ****'
+            checkAvailable = urllib.urlopen(result)
+            if checkAvailable.getcode() == 404:
+                print '**** check search result FAIL: result is 404 ****'
+                preReplyArray = ['我找不到，我找不到', '我不會，我不會', '我不知道，這就是我的極限啊']
+                postReplyArray = ['(掩面)', '(已哭)', '，為什麼要逼我!?', '(已難過)', ' :weary ']
+                catReply = random.choice(preReplyArray) + random.choice(postReplyArray)
+                self.send_from_messages([catReply])
+                return True
+
+            if 'gogobot' in message_string:
+                preReplyArray = ['經過我媲美google的龐大資料庫搜尋後', '看在你誠心誠意的份上', '我也不是隨便的人', '經過我的工人智慧判斷', '我想想看']
+                postReplyArray = ['...好吧', '，就賞你一個...', '，一定就是這個了', '，是這個嗎?']
+                catReply = random.choice(preReplyArray) + random.choice(postReplyArray)
+                self.send_from_messages([catReply])
+
             print '**** send search result: ' + result + ' ****'
             self.send_from_messages([result])
             return True
