@@ -505,7 +505,7 @@ class ChitChat(BotPlugin):
 
     def replySearchResultFail(self):
         preReplyArray = ['我找不到，我找不到', '我不會，我不會', '這就是我的極限啊', '我也不知道']
-        postReplyArray = ['(掩面)', '(已哭)', '，為什麼要逼我!?', '(已難過)', ' :weary ']
+        postReplyArray = ['(掩面)', '(已哭)', '，為什麼要逼我!?', '(已難過)', ' :weary: ']
         catReply = random.choice(preReplyArray) + random.choice(postReplyArray)
         self.send_from_messages([catReply])
 
@@ -534,7 +534,7 @@ class ChitChat(BotPlugin):
 
         if not '請問' in message_string:
             if ('gogobot' in message_string and random.random() <= 0.4): # 中斷掉要gogobot找圖功能
-                replyArray = ['很可怕，不要問', '我也不是隨隨便便教人的，先走了，掰', '叫我出聲我就出聲，那豈不是很沒面子，先洗澡了，掰', '你自己來?我媽叫我吃飯了，掰', '想問我的話要加請問', '小朋友，問人問題要加請問喔!', '小朋友，問人問題要加請問喔!']
+                replyArray = ['很可怕，不要問', '我也不是隨隨便便教人的，先走了，掰', '叫我出聲我就出聲，那豈不是很沒面子，先洗澡了，掰', '你自己來?我媽叫我吃飯了，掰', '想問我的話要加請問', '小朋友，問人問題要加請問喔!', '需要我幫忙的話就加請問喔，不要害羞']
                 reply = random.choice(replyArray)
                 print '**** send interrupted reply: ' + reply + ' ****'
                 self.send_from_messages([reply])
