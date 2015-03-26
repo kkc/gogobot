@@ -439,23 +439,23 @@ class ChitChat(BotPlugin):
 
             print '**** end of hist ****'
 
-    def longestSubstringFinder(self, S,T):
-        m = len(S)
-        n = len(T)
+    def longestSubstringFinder(self, source,target):
+        m = len(source)
+        n = len(target)
         counter = [[0]*(n+1) for x in range(m+1)]
         longest = 0
         lcs_set = set()
         for i in range(m):
             for j in range(n):
-                if S[i] == T[j]:
+                if source[i].lower() == target[j].lower():
                     c = counter[i][j] + 1
                     counter[i+1][j+1] = c
                     if c > longest:
                         lcs_set = set()
                         longest = c
-                        lcs_set.add(S[i-c+1:i+1])
+                        lcs_set.add(source[i-c+1:i+1])
                     elif c == longest:
-                        lcs_set.add(S[i-c+1:i+1])
+                        lcs_set.add(source[i-c+1:i+1])
         result = ""
         for item in lcs_set:
             result = result + item
@@ -463,9 +463,13 @@ class ChitChat(BotPlugin):
 
     def extractKeyword(self, message_string):
         param_q = message_string.replace('gogobot', '').replace('@', '').replace(': ', '');
-        param_q = param_q.replace('你', '').replace('會', '').replace('嗎', '').replace('?', '')
+        param_q = param_q.replace('你', '').replace('我', '').replace('他', '')
+        param_q = param_q.replace('可以', '').replace('會', '').replace('能', '').replace('是', '')
+        param_q = param_q.replace('知道', '').replace('了解', '').replace('曉得', '').replace('熟悉', '')
+        param_q = param_q.replace('了', '').replace('吧', '').replace('呢', '').replace('嗎', '')
+        param_q = param_q.replace('?', '').replace('!', '')
 
-        if len(param_q) == 1:
+        if len(param_q) <= 4:
             return param_q
 
         # http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=看正妹
@@ -513,21 +517,22 @@ class ChitChat(BotPlugin):
             print '**** send search result FAIL: cannot find keyword ****'
             return False
 
-        if ('gogobot' in message_string and '會' in message_string):
-            domain = 'http://ajax.googleapis.com/ajax/services/search/web?'
-            url_tag = 'cacheUrl'
-            replyArray = ["這還用問嗎?", "我是精英耶！", "Of Course~", "你哪位?問這麼沒水準的問題"]
-            reply = random.choice(replyArray)
-            self.send_from_messages([reply])
-        elif ('gogobot' in message_string and random.random() <= 0.4): # 中斷掉要gogobot找圖功能
-            replyArray = ["我也不是隨隨便便教人的，先走了，掰", "叫我出聲我就出聲，那豈不是很沒面子，先洗澡了，掰", "你來?我媽叫我吃飯了，掰"]
-            reply = random.choice(replyArray)
-            print '**** send interrupted reply: ' + reply + ' ****'
-            self.send_from_messages([reply])
-            return True
+        if not '請問' in message_string:
+            if ('gogobot' in message_string and '會' in message_string):
+                domain = 'http://ajax.googleapis.com/ajax/services/search/web?'
+                url_tag = 'cacheUrl'
+                replyArray = ['這還用問嗎?", "我是精英耶！', 'Of Course~', '你哪位?問這麼沒水準的問題']
+                reply = random.choice(replyArray)
+                self.send_from_messages([reply])
+            elif ('gogobot' in message_string and random.random() <= 0.4): # 中斷掉要gogobot找圖功能
+                replyArray = ['我也不是隨隨便便教人的，先走了，掰', '叫我出聲我就出聲，那豈不是很沒面子，先洗澡了，掰', '你自己來?我媽叫我吃飯了，掰', '想問我的話要加請問', '小朋友，問人問題要加請問喔!', '小朋友，問人問題要加請問喔!']
+                reply = random.choice(replyArray)
+                print '**** send interrupted reply: ' + reply + ' ****'
+                self.send_from_messages([reply])
+                return True
 
         if 'gogobot' in message_string:
-            preReplyArray = ["看在你誠心誠意的份上，好吧", "我也不是隨便的人，但今天就如你所願", "既然你誠心誠意的呼喊我了"]
+            preReplyArray = ['看在你誠心誠意的份上，好吧', '我也不是隨便的人，不過既然你不恥上問了', '既然你誠心誠意的呼喊我了', '我想你要的應該就是這個了', '我想想看，是這個嗎?']
             preReply = random.choice(preReplyArray)
             self.send_from_messages([preReply])
 
