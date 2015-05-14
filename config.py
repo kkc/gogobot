@@ -102,7 +102,6 @@ BOT_ADMINS = ('gogobot@gogolook.xmpp.slack.com', 'gogolook.irDP3gA9R4lR1k4FEjVX'
 # using the format (RoomName, Password).
 CHATROOM_PRESENCE = [(u'general@conference.gogolook.xmpp.slack.com'),
                      (u'developers@conference.gogolook.xmpp.slack.com'),
-                     (u'mobile@conference.gogolook.xmpp.slack.com'),
                      (u'gogobot-dev@conference.gogolook.xmpp.slack.com'),
                      (u'gogobot-pochi@conference.gogolook.xmpp.slack.com'),
                      (u'gogobot_secret_lab@conference.gogolook.xmpp.slack.com'),
