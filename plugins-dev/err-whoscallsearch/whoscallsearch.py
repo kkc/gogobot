@@ -19,11 +19,27 @@ from errbot import BotPlugin, botcmd
 import phonenumbers
 import requests
 import json
-import pdb
+from phonenumber_parse import PhonenumberParse
+
 
 class WhosCallSearch(BotPlugin):
     ''' Let's search numbers!
     '''
+
+    @botcmd
+    def search_v6(self, message, args):
+        ''' search info for whoscallsearch v6 '''
+        args_list = args.split(" ")
+        region = args_list[0]
+        number = args_list[1]
+        numberparse = PhonenumberParse(number, region.upper())
+
+        yield ':whoscall: searching [' + region.upper() + " " + numberparse.e164 + ']...'
+
+        result = self.whoscallsearch_v6(numberparse.e164, region.upper())
+
+        yield result
+
 
     @botcmd
     def search_v2(self, message, args):
@@ -31,7 +47,7 @@ class WhosCallSearch(BotPlugin):
         '''
         e164 = phonenumbers.format_number(phonenumbers.parse(args, 'TW'), \
                                           phonenumbers.PhoneNumberFormat.E164)
-        
+
         yield '(whoscall) searching [' + e164 + ']...'
 
         result = WhosCallSearch.get_tag_suggestions(e164)
@@ -75,6 +91,29 @@ class WhosCallSearch(BotPlugin):
 
         return result['results']
 
+    def whoscallsearch_v6(self, e164, region):
+        ''' do whoscall search version 6
+        '''
+        result = requests.get(
+            'https://api.whoscall.com/search/v5/%s/%s' % (region, e164),
+            headers={
+                "userid": "1234",
+                "accesstoken": "S84c5m5M73YcR9Z1h93M7i9"
+            }
+        )
+
+        result = json.loads(result.content)['result']
+
+        data = {}
+        data['name'] = result['name']
+        data['source'] = result['source']
+        data['type'] = result['type']
+        data['address'] = result['address']
+
+        response = "Name: %s\n來源: %s\n屬性: %s\n地址: %s\n" % \
+            (result['name'], result['source'], result['type'], result['address'])
+
+        return response
 
     @staticmethod
     def whoscallsearch_v3(e164):
@@ -125,7 +164,7 @@ class WhosCallSearch(BotPlugin):
         if result['profile']:
             if result['profile']['name']:
                 suggestions.append(result['profile']['name'])
-            
+
         for yellowpage in result['yellowpages']:
             suggestions.append(yellowpage)
 
