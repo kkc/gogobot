@@ -4,6 +4,8 @@
 import random
 
 import gspread
+import json
+from oauth2client.client import SignedJwtAssertionCredentials
 import sys
 
 
@@ -37,7 +39,11 @@ def getStarCount(list):
 
 
 def refreshData(dataList, tab_index):
-    gc = gspread.login('gogobot5566', 'ilovegogobot')
+    #gc = gspread.login('gogobot5566', 'ilovegogobot')
+    json_key = json.load(open('Gogobot-b4e12c74d505.json'))
+    scope = ['https://spreadsheets.google.com/feeds']
+    credentials = SignedJwtAssertionCredentials(json_key['client_email'], json_key['private_key'], scope)
+    gc = gspread.authorize(credentials)
 
     inti_col = 0
 
