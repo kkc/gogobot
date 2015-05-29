@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import gspread
+import json
+from oauth2client.client import SignedJwtAssertionCredentials
 
 
 ColumnCount = 5
@@ -23,7 +25,10 @@ def zhprint(obj):
 
 
 def load_data(dataList):
-    gc = gspread.login('gogobot5566', 'ilovegogobot')
+    json_key = json.load(open('Gogobot-b4e12c74d505.json'))
+    scope = ['https://spreadsheets.google.com/feeds']
+    credentials = SignedJwtAssertionCredentials(json_key['client_email'], json_key['private_key'], scope)
+    gc = gspread.authorize(credentials)
 
     wks = gc.open('gogobotReminder').get_worksheet(1)
     rowCount = wks.row_count
