@@ -578,8 +578,8 @@ class ChitChat(BotPlugin):
                     reply = random.choice(replyArray) + ' ' + random.choice(replyArray)
                     self.send_from_messages([reply])
 
-                preReplyArray = ['經過我媲美google的龐大資料庫搜尋後', '看在你誠心誠意的份上', '我也不是隨便的人', '經過我的工人智慧判斷', '我想想看']
-                postReplyArray = ['...好吧', '，就賞你一個...', '，一定就是這個了', '，是這個嗎?']
+                preReplyArray = ['經過我媲美google的龐大資料庫搜尋後', '看在你誠心誠意的份上', '我也不是隨便的人', '經過我的工人智慧判斷', '我想想看', '我猜猜看', '我問一下google', '我擲一下茭', '我冥想了一下']
+                postReplyArray = ['...好吧', '，就賞你一個...', '，一定就是這個了', '，是這個嗎?', '，有對嗎?', '，真相只有一個!', '，我只告訴你喔', '，原本不想說的']
                 catReply = random.choice(preReplyArray) + random.choice(postReplyArray)
                 self.send_from_messages([catReply])
 
