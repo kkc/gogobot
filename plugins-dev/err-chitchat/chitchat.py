@@ -855,7 +855,7 @@ class ChitChat(BotPlugin):
                 self.angry += 1
                 if random.randrange(0, 101) > 50:
                     self.send(mMessage.getFrom(), random.choice(response), message_type=mMessage.getType())
-                    self.hatedPeopleName = mMessage.message.getFrom().getResource()
+                    self.hatedPeopleName = mMessage.getFrom().getResource()
                     return True
                 else:
                     return False

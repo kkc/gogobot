@@ -13,8 +13,7 @@ Gogolook Hipchat bot created using [err bot](https://github.com/gbin/err)
 	`export CPPFLAGS=-Qunused-arguments`
 	`export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig/`
 4. install err `pip install err`
-7. install sleekxmpp 1.1.0 (version >1.1 will come with "ERROR:sleekxmpp.plugins.base:Unable to load plugin: old_0004")
-	`pip install sleekxmpp==1.1.0`
+7. install sleekxmpp    `pip install sleekxmpp`
 5. finally, run bot `err.py`
 
 
