@@ -1,0 +1,10 @@
+[Core]
+Name = ChitChat
+Module = chitchat
+ 
+[Python]
+Version = 2+
+
+[Documentation]
+Description = An annoying chit chat bot
+
